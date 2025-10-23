@@ -22,14 +22,14 @@ android {
             buildConfigField(
                 "String",
                 "N8N_BASE_URL",
-                "\"https://arthursilvasoares.app.n8n.cloud/webhook-test/chat\""
+                "\"https://arthursilvasoares.app.n8n.cloud/webhook-test/\""
             )
         }
         release {
             buildConfigField(
                 "String",
                 "N8N_BASE_URL",
-                "\"https://arthursilvasoares.app.n8n.cloud/webhook-test/chat\""
+                "\"https://arthursilvasoares.app.n8n.cloud/webhook-test/\""
             )
             isMinifyEnabled = false
             proguardFiles(
@@ -54,14 +54,14 @@ android {
 }
 
 dependencies {
-<<<<<<< HEAD
+
     implementation(platform("androidx.compose:compose-bom:2024.10.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3:1.3.0")
     implementation("androidx.compose.foundation:foundation:1.7.5")
-=======
+
     implementation("androidx.navigation:navigation-compose:2.8.3")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -73,7 +73,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
 
->>>>>>> 369c7e1d1b7980f55bac5ef8ca21f212f1e83c4b
+
     implementation("androidx.compose.material:material-icons-extended:1.7.5")
 
     implementation("androidx.activity:activity-compose:1.9.3")
