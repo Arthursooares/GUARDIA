@@ -1,8 +1,17 @@
+<<<<<<< HEAD
 @file:Suppress("unused")
 
 package com.example.guardia.ui
 
 
+=======
+
+@file:Suppress("unused")
+package com.example.guardia.ui
+
+
+
+>>>>>>> 369c7e1d1b7980f55bac5ef8ca21f212f1e83c4b
 import android.util.Patterns
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -48,12 +57,15 @@ import kotlinx.coroutines.launch
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+<<<<<<< HEAD
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+=======
+>>>>>>> 369c7e1d1b7980f55bac5ef8ca21f212f1e83c4b
 
 /**
  * Tela de Cadastro inspirada no layout do Guardiã (imagem enviada).
@@ -544,6 +556,11 @@ private fun LoginScreenPreview() {
 }
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 369c7e1d1b7980f55bac5ef8ca21f212f1e83c4b
 sealed class AppRoute(val route: String) {
     data object Login : AppRoute("login")
     data object Register : AppRoute("register")
@@ -577,6 +594,7 @@ fun AppNav(
     }
 }
 
+<<<<<<< HEAD
 
 // --- Validators ---
 object Validators {
@@ -802,3 +820,5 @@ fun RegisterScreenWithVM(
         }
     }
 }
+=======
+>>>>>>> 369c7e1d1b7980f55bac5ef8ca21f212f1e83c4b
