@@ -1,83 +1,39 @@
 package com.example.guardia.ui.theme
 
-// ===== IMPORTS =====
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.guardia.BuildConfig
+import com.example.guardia.network.ChatRequest
+import com.example.guardia.network.provideChatApi
 import kotlinx.coroutines.launch
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
+import retrofit2.HttpException
+import java.io.IOException
+import java.net.SocketTimeoutException
 
-
-
-// ===== Retrofit / OkHttp / Gson =====
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.POST
-
-// ===== MODELS (mantivemos os seus) =====
 enum class Role { USER, ASSISTANT }
 
-data class Message(
-    val id: String = System.currentTimeMillis().toString(),
-    val role: Role,
-    val content: String,
-    val timestamp: Long = System.currentTimeMillis()
-)
-
-data class ChatRequest(val text: String, val userId: String? = null)
-data class ChatResponse(
-    val messageId: String,
-    val role: String,
-    val content: String,
-    val receivedAt: String,
-    val severity: Int? = null,
-    val resumo: String? = null,
-    val report_text: String? = null
-)
-
-
-// ===== API (igual você já tinha) =====
-interface ChatApi {
-    @POST("chat") // final: baseUrl + "chat"
-    suspend fun send(@Body body: ChatRequest): ChatResponse
-}
-
-private val httpClient by lazy {
-    val log = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
-    OkHttpClient.Builder()
-        .addInterceptor(log)
-        .build()
-}
-
-private val chatApi: ChatApi by lazy {
-    Retrofit.Builder()
-        .baseUrl(com.example.guardia.BuildConfig.N8N_BASE_URL) // ex.: https://.../webhook/
-        .client(httpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(ChatApi::class.java)
-}
-
-// ===== UI DO CHAT =====
 data class MessageUi(
     val id: String,
     val role: Role,
@@ -140,17 +96,23 @@ private fun TypingBubble() {
 fun GuardiaScreen() {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    // API
+    val chatApi = remember {
+        provideChatApi(
+            baseUrl = BuildConfig.N8N_BASE_URL, // precisa terminar com /
+            debug = BuildConfig.DEBUG
+        )
+    }
 
     val messages = remember { mutableStateListOf<MessageUi>() }
-    var userMessage by remember { mutableStateOf("") }
+    var userMessage by rememberSaveable { mutableStateOf("") }
     var isTyping by remember { mutableStateOf(false) }
 
-    // >>> estados para denúncia <<<
+    // dados opcionais que podem vir do backend
     var lastSeverity by remember { mutableStateOf<Int?>(null) }
     var lastReport by remember { mutableStateOf<String?>(null) }
-
-    // >>> novo: modo analisar <<<
-    var analyzeMode by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (messages.isEmpty()) {
@@ -165,6 +127,65 @@ fun GuardiaScreen() {
     val listState = rememberLazyListState()
     LaunchedEffect(messages.size, isTyping) {
         if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
+    }
+
+    fun canSend(): Boolean = userMessage.isNotBlank() && !isTyping
+
+    suspend fun sendMessage() {
+        if (!canSend()) return
+        val original = userMessage.trim()
+
+        // adiciona msg do usuário
+        messages += MessageUi(
+            id = System.currentTimeMillis().toString() + "_u",
+            role = Role.USER,
+            text = original
+        )
+        userMessage = ""
+        isTyping = true
+        keyboard?.hide()
+
+        // reset dos dados de denúncia a cada pergunta normal
+        lastSeverity = null
+        lastReport = null
+
+        try {
+            // envia texto cru; n8n decide o que fazer
+            val res = chatApi.send(ChatRequest(text = original))
+            messages += MessageUi(
+                id = System.currentTimeMillis().toString() + "_a",
+                role = Role.ASSISTANT,
+                text = res.content
+            )
+            lastSeverity = res.severity
+            lastReport = res.reportText
+        } catch (e: SocketTimeoutException) {
+            messages += MessageUi(
+                id = System.currentTimeMillis().toString() + "_e",
+                role = Role.ASSISTANT,
+                text = "Tempo de resposta esgotado. Tente novamente."
+            )
+        } catch (e: HttpException) {
+            messages += MessageUi(
+                id = System.currentTimeMillis().toString() + "_e",
+                role = Role.ASSISTANT,
+                text = "Erro do servidor (${e.code()})."
+            )
+        } catch (e: IOException) {
+            messages += MessageUi(
+                id = System.currentTimeMillis().toString() + "_e",
+                role = Role.ASSISTANT,
+                text = "Sem conexão com a internet."
+            )
+        } catch (e: Exception) {
+            messages += MessageUi(
+                id = System.currentTimeMillis().toString() + "_e",
+                role = Role.ASSISTANT,
+                text = "Falha inesperada: ${e.message ?: "desconhecida"}"
+            )
+        } finally {
+            isTyping = false
+        }
     }
 
     Scaffold(
@@ -189,7 +210,9 @@ fun GuardiaScreen() {
         ) {
             // histórico
             Surface(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
                 color = Color.Transparent
             ) {
                 LazyColumn(
@@ -198,20 +221,18 @@ fun GuardiaScreen() {
                     contentPadding = PaddingValues(top = 12.dp, bottom = 12.dp)
                 ) {
                     items(messages, key = { it.id }) { msg -> Bubble(msg) }
-
                     if (isTyping) item { TypingBubble() }
 
-                    // botão compartilhar denúncia (quando houver)
                     if ((lastSeverity ?: 0) >= 2 && !lastReport.isNullOrBlank()) {
                         item {
                             TextButton(
                                 onClick = {
-                                    val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                    val send = Intent(Intent.ACTION_SEND).apply {
                                         type = "text/plain"
-                                        putExtra(android.content.Intent.EXTRA_TEXT, lastReport)
+                                        putExtra(Intent.EXTRA_TEXT, lastReport)
                                     }
                                     context.startActivity(
-                                        android.content.Intent.createChooser(send, "Compartilhar denúncia")
+                                        Intent.createChooser(send, "Compartilhar denúncia")
                                     )
                                 },
                                 modifier = Modifier
@@ -223,25 +244,6 @@ fun GuardiaScreen() {
                         }
                     }
                 }
-            }
-
-            // >>> novo: chip para ativar/desativar análise <<<
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FilterChip(
-                    selected = analyzeMode,
-                    onClick = { analyzeMode = !analyzeMode },
-                    label = { Text(if (analyzeMode) "Analisar: ATIVO" else "Analisar") },
-                    leadingIcon = {},
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = Color(0xFF004D40),
-                        selectedLabelColor = Color.White
-                    )
-                )
             }
 
             // input
@@ -257,8 +259,12 @@ fun GuardiaScreen() {
                     value = userMessage,
                     onValueChange = { userMessage = it },
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text(if (analyzeMode) "Descreva para analisar" else "Pergunte à Guardiã") },
+                    placeholder = { Text("Pergunte à Guardiã") },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                    keyboardActions = KeyboardActions(
+                        onSend = { scope.launch { sendMessage() } }
+                    ),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedContainerColor = Color.Transparent,
                         focusedContainerColor = Color.Transparent,
@@ -267,54 +273,12 @@ fun GuardiaScreen() {
                     )
                 )
 
-                val showSend = userMessage.isNotBlank()
-                IconButton(onClick = {
-                    if (!showSend) return@IconButton
-
-                    val original = userMessage.trim()
-                    // >>> prefixo "/analisar " quando o modo estiver ativo <<<
-                    val payload = if (analyzeMode) "/analisar $original" else original
-
-                    messages += MessageUi(
-                        id = System.currentTimeMillis().toString() + "_u",
-                        role = Role.USER,
-                        text = original
-                    )
-                    userMessage = ""
-                    isTyping = true
-
-                    // reset dos dados de denúncia quando for chat normal
-                    if (!analyzeMode) {
-                        lastSeverity = null
-                        lastReport = null
-                    }
-
-                    scope.launch {
-                        try {
-                            val res = chatApi.send(ChatRequest(payload))
-
-                            messages += MessageUi(
-                                id = System.currentTimeMillis().toString() + "_a",
-                                role = Role.ASSISTANT,
-                                text = res.content
-                            )
-
-                            // guarda dados de denúncia se vierem
-                            lastSeverity = res.severity
-                            lastReport = res.report_text
-
-                        } catch (e: Exception) {
-                            messages += MessageUi(
-                                id = System.currentTimeMillis().toString() + "_e",
-                                role = Role.ASSISTANT,
-                                text = "Falha de rede: ${e.message ?: "desconhecida"}"
-                            )
-                        } finally {
-                            isTyping = false
-                        }
-                    }
-                }) {
-                    if (showSend) {
+                val canTap = canSend()
+                IconButton(
+                    enabled = canTap,
+                    onClick = { scope.launch { sendMessage() } }
+                ) {
+                    if (canTap) {
                         Icon(Icons.Filled.Send, contentDescription = "Enviar", tint = Color(0xFF26A69A))
                     } else {
                         Icon(Icons.Filled.Mic, contentDescription = "Microfone", tint = Color(0xFF26A69A))
