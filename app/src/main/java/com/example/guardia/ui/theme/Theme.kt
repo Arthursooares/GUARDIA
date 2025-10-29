@@ -12,25 +12,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = neutral100, //
+    secondary =
+    tertiary =
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = brand900, //cor do texto e botões
+    onPrimary = neutral100, //cards e textbox
+    secondary = brand950, // card home e chat popup
+    onSecondary = neutral100, // texto card home
+    tertiary = yellow50, // texto login/cadastro inferior
+    background = brand1200, //cor do fundo
+    onBackground = brand900, //cor do texto de funo
+    surface = neutral100,
+    onSurface = brand900,
+    
 )
 
 @Composable

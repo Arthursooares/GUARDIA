@@ -14,6 +14,14 @@ val brand600 = Color(0xFF2563EB)
 val brand700 = Color(0xFF1D4ED8)
 val brand800 = Color(0xFF1E40AF)
 val brand900 = Color(0xFF1E3A8A)
+val brand950 = Color(0xFF12B1AC)
+val brand1000 = Color(0xFF080F24)
+val brand1100 = Color(0xFFDDE0E0)
+val brand1200 = Color(0xFF6EA9CE)
+val brand1300 = Color(0xFF30BAA8)
+val brand1400 = Color(0xFF111827)
+
+
 
 //TONS NEUTROS(NEUTRAL DO FIGMA)
 
@@ -27,3 +35,7 @@ val neutral600 = Color(0xFF4B5563)
 val neutral700 = Color(0xFF374151)
 val neutral800 = Color(0xFF1F2937)
 val neutal900 = Color(0xFF111827)
+
+// TONS DE AMARELO
+
+val yellow50 = Color(0xFFF4C430)
