@@ -1,6 +1,7 @@
-package com.example.guardia.ui.theme
+package com.example.guardia.screens
 
 // ===== IMPORTS =====
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-
+import com.example.guardia.BuildConfig
 
 
 // ===== Retrofit / OkHttp / Gson =====
@@ -70,7 +71,7 @@ private val httpClient by lazy {
 
 private val chatApi: ChatApi by lazy {
     Retrofit.Builder()
-        .baseUrl(com.example.guardia.BuildConfig.N8N_BASE_URL) // ex.: https://.../webhook/
+        .baseUrl(BuildConfig.N8N_BASE_URL) // ex.: https://.../webhook/
         .client(httpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
@@ -206,12 +207,12 @@ fun GuardiaScreen() {
                         item {
                             TextButton(
                                 onClick = {
-                                    val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                    val send = Intent(Intent.ACTION_SEND).apply {
                                         type = "text/plain"
-                                        putExtra(android.content.Intent.EXTRA_TEXT, lastReport)
+                                        putExtra(Intent.EXTRA_TEXT, lastReport)
                                     }
                                     context.startActivity(
-                                        android.content.Intent.createChooser(send, "Compartilhar denúncia")
+                                        Intent.createChooser(send, "Compartilhar denúncia")
                                     )
                                 },
                                 modifier = Modifier
