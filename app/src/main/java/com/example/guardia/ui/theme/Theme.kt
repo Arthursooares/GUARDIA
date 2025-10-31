@@ -10,6 +10,11 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.example.guardia.ui.theme.brand1200
+import com.example.guardia.ui.theme.brand900
+import com.example.guardia.ui.theme.brand950
+import com.example.guardia.ui.theme.neutral100
+import com.example.guardia.ui.theme.yellow50
 
 private val DarkColorScheme = darkColorScheme(
     primary = neutral100, //
