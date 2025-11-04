@@ -8,24 +8,31 @@ import androidx.navigation.compose.composable
 @Composable
 fun AppNavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "splash") {
-        composable("splash") { 
-            SplashScreen(onNavigateToLogin = { 
-                // Limpa a pilha de navegação para que o usuário não volte para a splash screen
-                navController.navigate("login") {
-                    popUpTo("splash") { inclusive = true }
-                }
-            })
-        }
-        composable("login") { 
-            LoginScreen(
-                onRegisterClick = { navController.navigate("CadastroScreen") }
+
+        composable("splash") {
+            SplashScreen(
+                onNavigateToLogin = { navController.navigate("login") }
             )
         }
-        composable("register") { 
-            CadastroScreen(onRegisterClick = { 
-                // Volta para a tela de login após o cadastro
-                navController.popBackStack() 
-            })
+
+        composable("login") {
+            LoginScreen(
+                onRegisterClick = { navController.navigate("register") },
+                onLoginClick = { _, _ ->
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true } // remove tela de login da pilha
+                    }
+                }
+            )
+        }
+
+        composable("register") {
+            /* Tela de cadastro */
+        }
+
+        // 👉 nova rota adicionada
+        composable("home") {
+            HomeScreen()
         }
     }
 }
