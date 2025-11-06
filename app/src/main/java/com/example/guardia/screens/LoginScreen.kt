@@ -45,7 +45,10 @@ import com.example.guardia.ui.theme.GuardiaTheme
 
 
 @Composable
-fun LoginScreen(onRegisterClick: () -> Unit) {
+fun LoginScreen(
+    onRegisterClick: () -> Unit,
+    onLoginClick: (String, String) -> Unit // ✅ novo parâmetro
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val tituloTexto = "Login"
@@ -66,21 +69,14 @@ fun LoginScreen(onRegisterClick: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState) // AQUI: Adicionamos a rolagem vertical
-                .padding(
-                    top = 32.dp,
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 32.dp
-                ), 
-
+                .verticalScroll(scrollState)
+                .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 painter = painterResource(id = R.drawable.shield),
                 contentDescription = "Logo Guardião",
-                modifier = Modifier
-                    .size(240.dp),
+                modifier = Modifier.size(240.dp),
                 contentScale = ContentScale.Crop
             )
 
@@ -88,20 +84,16 @@ fun LoginScreen(onRegisterClick: () -> Unit) {
                 text = tituloTexto,
                 fontSize = 34.sp,
                 color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold, // Opcional: Deixa o texto em negrito
-                modifier = Modifier.padding(
-                    bottom = 32.dp
-                )
-
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Container para o label e o campo de texto, alinhado à esquerda
             Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
                 Text(
                     text = "Email",
-                    fontSize = 20.sp, // tamanho da fonte do label
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary, // Cor azul brilhante do label
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
                 )
 
@@ -110,27 +102,26 @@ fun LoginScreen(onRegisterClick: () -> Unit) {
                     onValueChange = { email = it },
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("email@gmail.com") },
-                    shape = RoundedCornerShape(16.dp), // raio dos cantos
+                    shape = RoundedCornerShape(16.dp),
                     colors = TextFieldDefaults.colors(
                         focusedTextColor = MaterialTheme.colorScheme.primary,
                         unfocusedTextColor = Color.Transparent,
                         cursorColor = Color.Black,
-                        focusedContainerColor = MaterialTheme.colorScheme.onPrimary, // Fundo branco
-                        unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary, // Fundo branco
-                        focusedIndicatorColor = Color.Transparent, // Sem linha de foco
-                        unfocusedIndicatorColor = Color.Transparent // Sem linha de foco
+                        focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
                     ),
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.padding(8.dp))
 
-
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
                     Text(
                         text = "Senha",
-                        fontSize = 20.sp, // fonte do label
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimary, // Cor azul brilhante do label
+                        color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
                     )
 
@@ -139,33 +130,32 @@ fun LoginScreen(onRegisterClick: () -> Unit) {
                         onValueChange = { password = it },
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text("********") },
-                        shape = RoundedCornerShape(16.dp), // raio dos cantos
+                        shape = RoundedCornerShape(16.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedTextColor = MaterialTheme.colorScheme.primary, // Cor do texto
-                            unfocusedTextColor = Color.Transparent, // Cor do texto
-                            cursorColor = Color.Black, // Cor do cursor
-                            focusedContainerColor = MaterialTheme.colorScheme.onPrimary, // Fundo branco
-                            unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary, // Fundo branco
-                            focusedIndicatorColor = Color.Transparent, // Sem linha de foco
-                            unfocusedIndicatorColor = Color.Transparent // Sem linha de foco
+                            focusedTextColor = MaterialTheme.colorScheme.primary,
+                            unfocusedTextColor = Color.Transparent,
+                            cursorColor = Color.Black,
+                            focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
                         ),
                         singleLine = true
                     )
+
                     Spacer(modifier = Modifier.padding(5.dp))
+
+                    // ✅ Botão agora chama onLoginClick
                     Button(
-                        onClick = onRegisterClick,
+                        onClick = { onLoginClick(email, password) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 16.dp),
-                        shape = RoundedCornerShape(28.dp), // Shape para os TextFields
-                        contentPadding = PaddingValues(), // padding padrão para ter controle total
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent // Botão fica transparente
-                        )
+                        shape = RoundedCornerShape(28.dp),
+                        contentPadding = PaddingValues(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                     ) {
-                        // O Box contém o gradiente e o texto
                         Box(
-
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
@@ -187,23 +177,23 @@ fun LoginScreen(onRegisterClick: () -> Unit) {
                         }
                     }
                 }
+
                 Spacer(modifier = Modifier.padding(16.dp))
 
                 Text(
                     fontSize = 14.sp,
                     text = buildAnnotatedString {
                         withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onPrimary)) {
-                            append("Não tem uma conta? ") // AQUI: Usamos um texto mais curto
+                            append("Não tem uma conta? ")
                         }
                         withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
-                            append("Cadastre-se") // AQUI: Usamos um texto mais curto
+                            append("Cadastre-se")
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onRegisterClick() },
                     textAlign = TextAlign.Center
-
                 )
             }
         }
@@ -214,6 +204,9 @@ fun LoginScreen(onRegisterClick: () -> Unit) {
 @Composable
 fun LoginScreenPreview() {
     GuardiaTheme {
-        LoginScreen(onRegisterClick = {})
+        LoginScreen(
+            onRegisterClick = {},
+            onLoginClick = { _, _ -> } // ✅ necessário para o preview
+        )
     }
 }
