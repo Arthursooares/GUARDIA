@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.guardia.ui.theme.GuardiaTheme
 
 @Composable
 fun HomeScreen(
@@ -286,5 +287,7 @@ data class HomeCardData(
 @Preview(showBackground = true, backgroundColor = 0xFFE8F5FF)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    GuardiaTheme {
+        HomeScreen()
+    }
 }
