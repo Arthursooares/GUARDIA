@@ -22,13 +22,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.compose.foundation.Image
+import com.example.guardia.R
+
+
+
 
 @Composable
 fun HomeScreen(
+    navController: NavHostController,
     userName: String = "Lívia",
     onMenuClick: () -> Unit = {},
     onChatClick: () -> Unit = {},
@@ -50,7 +59,6 @@ fun HomeScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // 🔹 TOP BAR
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -67,7 +75,6 @@ fun HomeScreen(
                 }
             }
 
-            // 🔹 CONTEÚDO SCROLLÁVEL
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -114,7 +121,7 @@ fun HomeScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Alguém da comunidade pode te ajudar. Vamos resolver isso juntos!",
+                                text = "Algum problema ou dúvida? vamos resolver isso juntos!",
                                 color = Color.White.copy(alpha = 0.9f),
                                 fontSize = 12.sp
                             )
@@ -140,22 +147,36 @@ fun HomeScreen(
                         Box(
                             modifier = Modifier
                                 .width(90.dp)
+                                .clickable {
+                                // }
+                                }
                                 .fillMaxHeight(),
                             contentAlignment = Alignment.BottomEnd
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .width(70.dp)
-                                    .height(120.dp)
+                                    .fillMaxWidth()
+                                    .height(250.dp)
                                     .background(Color.Transparent)
-                            )
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.personagem),
+                                    contentDescription = "Personagem Guardiã",
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd) // coloca à direita
+                                        .width(180.dp)               // largura ajustada
+                                        .height(240.dp),             // altura ajustada
+                                    contentScale = ContentScale.Fit  // mantém proporção
+                                )
+                            }
+
+
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // 🔹 LISTA DE CARDS (tipada explicitamente)
                 val cards: List<HomeCardData> = remember {
                     listOf(
                         HomeCardData("Dicas de segurança", Icons.Filled.Security),
@@ -206,9 +227,10 @@ fun HomeScreen(
                     },
                     label = { Text("Relatórios", fontSize = 10.sp) }
                 )
+
                 NavigationBarItem(
                     selected = false,
-                    onClick = {},
+                    onClick = { onItemClick("guardia") }, // ✅ Navega para GuardiaScreen
                     icon = {
                         Icon(
                             imageVector = Icons.Filled.Star,
@@ -216,8 +238,10 @@ fun HomeScreen(
                             tint = Color(0xFF9AA9B5)
                         )
                     },
-                    label = { Text("Guardiã", fontSize = 10.sp) }
+                    label = { Text("Guardiã") }
                 )
+
+
                 NavigationBarItem(
                     selected = false,
                     onClick = {},
@@ -286,5 +310,6 @@ data class HomeCardData(
 @Preview(showBackground = true, backgroundColor = 0xFFE8F5FF)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    val navController = androidx.navigation.compose.rememberNavController()
+    HomeScreen(navController = navController)
 }
