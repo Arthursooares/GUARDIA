@@ -43,7 +43,7 @@ fun SplashScreen(onNavigateToLogin: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logo_guardia),
+                painter = painterResource(id = R.drawable.shield),
                 contentDescription = "Logo Guardião",
                 modifier = Modifier.size(350.dp)
             )

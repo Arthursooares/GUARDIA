@@ -3,178 +3,210 @@ package com.example.guardia.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.guardia.R
+import com.example.guardia.ui.theme.GuardiaTheme
+
 
 @Composable
 fun LoginScreen(
     onRegisterClick: () -> Unit,
-    onLoginClick: (email: String, password: String) -> Unit = { _, _ -> }
+    onLoginClick: (String, String) -> Unit // ✅ novo parâmetro
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val tituloTexto = "Login"
+    val scrollState = rememberScrollState()
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black) // fundo sólido para evitar bordas brancas
     ) {
-        // Fundo
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF020817),
-                            Color(0xFF041E3B),
-                            Color(0xFF020817)
-                        )
-                    )
-                )
+        Image(
+            painter = painterResource(id = R.drawable.bg_splash),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop // garante que a imagem cubra toda a tela
         )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .verticalScroll(scrollState)
+                .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Image(
-                painter = painterResource(id = R.drawable.logo_guardia),
-                contentDescription = "Logo Guardiã",
-                modifier = Modifier
-                    .size(300.dp)
-                    .padding(bottom = 8.dp),
-                contentScale = ContentScale.Fit
+                painter = painterResource(id = R.drawable.shield),
+                contentDescription = "Logo Guardião",
+                modifier = Modifier.size(240.dp),
+                contentScale = ContentScale.Crop
             )
-
-            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Login",
-                style = TextStyle(
-                    fontSize = 28.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold
-                )
+                text = tituloTexto,
+                fontSize = 34.sp,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // EMAIL
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                placeholder = { Text("Email", color = Color.Black) }, // 👈 fica sempre dentro
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Color(0xFF163A7B)
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                placeholder = { Text("Senha", color = Color.Black) }, // 👈 idem
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Color(0xFF163A7B)
-                )
-            )
-
-
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = { onLoginClick(email, password) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF163A7B)
-                )
-            ) {
+            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
                 Text(
-                    text = "Entrar",
-                    fontSize = 16.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold
+                    text = "Email",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
+                )
+
+                TextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("email@gmail.com") },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.primary,
+                        unfocusedTextColor = Color.Transparent,
+                        cursorColor = Color.Black,
+                        focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.padding(8.dp))
+
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+                    Text(
+                        text = "Senha",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
+                    )
+
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("********") },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.colorScheme.primary,
+                            unfocusedTextColor = Color.Transparent,
+                            cursorColor = Color.Black,
+                            focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        singleLine = true
+                    )
+
+                    Spacer(modifier = Modifier.padding(5.dp))
+
+                    // ✅ Botão agora chama onLoginClick
+                    Button(
+                        onClick = { onLoginClick(email, password) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        shape = RoundedCornerShape(28.dp),
+                        contentPadding = PaddingValues(),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    brush = Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color(0xFF1E3A8A),
+                                            Color(0xFF080F2F)
+                                        )
+                                    )
+                                )
+                                .padding(vertical = 16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Entrar",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontSize = 22.sp
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.padding(16.dp))
+
+                Text(
+                    fontSize = 14.sp,
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onPrimary)) {
+                            append("Não tem uma conta? ")
+                        }
+                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
+                            append("Cadastre-se")
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onRegisterClick() },
+                    textAlign = TextAlign.Center
                 )
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Ainda não possui uma conta? ",
-                    color = Color.White,
-                    fontSize = 13.sp
-                )
-                Text(
-                    text = "Cadastre-se agora.",
-                    color = Color(0xFFF3C247),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clickable { onRegisterClick() }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(onRegisterClick = {})
+    GuardiaTheme {
+        LoginScreen(
+            onRegisterClick = {},
+            onLoginClick = { _, _ -> } // ✅ necessário para o preview
+        )
+    }
 }
