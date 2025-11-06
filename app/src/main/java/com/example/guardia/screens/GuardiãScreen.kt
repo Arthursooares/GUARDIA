@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.ui.graphics.Brush
 import com.example.guardia.BuildConfig
 
 
@@ -187,7 +188,14 @@ fun GuardiaScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Color(0xFF26A69A))
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            Color(0xFFE0F7FA), // azul-claro superior
+                            Color(0xFFB2EBF2)  // azul mais forte inferior
+                        )
+                    )
+                )
         ) {
             // histórico
             Surface(
