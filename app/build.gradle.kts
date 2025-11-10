@@ -18,24 +18,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // Base URL para o emulador falando com seu n8n local
-    buildTypes {
-        debug {
-            buildConfigField(
-                "String",
-                "N8N_BASE_URL",
-                "\"https://arthursilvasoares.app.n8n.cloud/webhook/\"" // termina com /
-            )
-        }
-        release {
-            buildConfigField(
-                "String",
-                "N8N_BASE_URL",
-                "\"https://arthursilvasoares.app.n8n.cloud/webhook/\""
-            )
-            isMinifyEnabled = false
-        }
-    }
     buildFeatures { buildConfig = true }
 
     // Java/Kotlin alinhados em 17

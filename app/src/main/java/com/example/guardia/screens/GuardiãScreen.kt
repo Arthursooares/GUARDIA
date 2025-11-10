@@ -15,72 +15,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.ui.graphics.Brush
-import com.example.guardia.BuildConfig
 
+// ===== NETWORK (já prontos no pacote network) =====
+import com.example.guardia.network.ChatApi
+import com.example.guardia.network.ChatRequest
+import com.example.guardia.network.provideChatApi
 
-// ===== Retrofit / OkHttp / Gson =====
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.POST
-
-// ===== MODELS (mantivemos os seus) =====
+// ===== MODELS =====
 enum class Role { USER, ASSISTANT }
 
-data class Message(
-    val id: String = System.currentTimeMillis().toString(),
-    val role: Role,
-    val content: String,
-    val timestamp: Long = System.currentTimeMillis()
-)
-
-data class ChatRequest(val text: String, val userId: String? = null)
-data class ChatResponse(
-    val messageId: String,
-    val role: String,
-    val content: String,
-    val receivedAt: String,
-    val severity: Int? = null,
-    val resumo: String? = null,
-    val report_text: String? = null
-)
-
-
-// ===== API (igual você já tinha) =====
-interface ChatApi {
-    @POST("chat") // final: baseUrl + "chat"
-    suspend fun send(@Body body: ChatRequest): ChatResponse
-}
-
-private val httpClient by lazy {
-    val log = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
-    OkHttpClient.Builder()
-        .addInterceptor(log)
-        .build()
-}
-
-private val chatApi: ChatApi by lazy {
-    Retrofit.Builder()
-        .baseUrl(BuildConfig.N8N_BASE_URL) // ex.: https://.../webhook/
-        .client(httpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(ChatApi::class.java)
-}
-
-// ===== UI DO CHAT =====
 data class MessageUi(
     val id: String,
     val role: Role,
@@ -144,15 +95,18 @@ fun GuardiaScreen() {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    // usa o retrofit centralizado
+    val chatApi: ChatApi = remember { provideChatApi() }
+
     val messages = remember { mutableStateListOf<MessageUi>() }
     var userMessage by remember { mutableStateOf("") }
     var isTyping by remember { mutableStateOf(false) }
 
-    // >>> estados para denúncia <<<
+    // denuncia
     var lastSeverity by remember { mutableStateOf<Int?>(null) }
     var lastReport by remember { mutableStateOf<String?>(null) }
 
-    // >>> novo: modo analisar <<<
+    // analisar
     var analyzeMode by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -167,7 +121,9 @@ fun GuardiaScreen() {
 
     val listState = rememberLazyListState()
     LaunchedEffect(messages.size, isTyping) {
-        if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.size - 1)
+        }
     }
 
     Scaffold(
@@ -191,15 +147,17 @@ fun GuardiaScreen() {
                 .background(
                     Brush.verticalGradient(
                         listOf(
-                            Color(0xFFE0F7FA), // azul-claro superior
-                            Color(0xFFB2EBF2)  // azul mais forte inferior
+                            Color(0xFFE0F7FA),
+                            Color(0xFFB2EBF2)
                         )
                     )
                 )
         ) {
             // histórico
             Surface(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
                 color = Color.Transparent
             ) {
                 LazyColumn(
@@ -211,7 +169,6 @@ fun GuardiaScreen() {
 
                     if (isTyping) item { TypingBubble() }
 
-                    // botão compartilhar denúncia (quando houver)
                     if ((lastSeverity ?: 0) >= 2 && !lastReport.isNullOrBlank()) {
                         item {
                             TextButton(
@@ -235,7 +192,7 @@ fun GuardiaScreen() {
                 }
             }
 
-            // >>> novo: chip para ativar/desativar análise <<<
+            // chip analisar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -246,7 +203,6 @@ fun GuardiaScreen() {
                     selected = analyzeMode,
                     onClick = { analyzeMode = !analyzeMode },
                     label = { Text(if (analyzeMode) "Analisar: ATIVO" else "Analisar") },
-                    leadingIcon = {},
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = Color(0xFF004D40),
                         selectedLabelColor = Color.White
@@ -277,54 +233,64 @@ fun GuardiaScreen() {
                     )
                 )
 
-                val showSend = userMessage.isNotBlank()
-                IconButton(onClick = {
-                    if (!showSend) return@IconButton
+                val canSend = userMessage.isNotBlank()
+                IconButton(
+                    onClick = {
+                        if (!canSend) return@IconButton
 
-                    val original = userMessage.trim()
-                    // >>> prefixo "/analisar " quando o modo estiver ativo <<<
-                    val payload = if (analyzeMode) "/analisar $original" else original
+                        val original = userMessage.trim()
+                        val payload = if (analyzeMode) "/analisar $original" else original
 
-                    messages += MessageUi(
-                        id = System.currentTimeMillis().toString() + "_u",
-                        role = Role.USER,
-                        text = original
-                    )
-                    userMessage = ""
-                    isTyping = true
+                        messages += MessageUi(
+                            id = System.currentTimeMillis().toString() + "_u",
+                            role = Role.USER,
+                            text = original
+                        )
+                        userMessage = ""
+                        isTyping = true
 
-                    // reset dos dados de denúncia quando for chat normal
-                    if (!analyzeMode) {
-                        lastSeverity = null
-                        lastReport = null
-                    }
-
-                    scope.launch {
-                        try {
-                            val res = chatApi.send(ChatRequest(payload))
-
-                            messages += MessageUi(
-                                id = System.currentTimeMillis().toString() + "_a",
-                                role = Role.ASSISTANT,
-                                text = res.content
-                            )
-
-                            // guarda dados de denúncia se vierem
-                            lastSeverity = res.severity
-                            lastReport = res.report_text
-
-                        } catch (e: Exception) {
-                            messages += MessageUi(
-                                id = System.currentTimeMillis().toString() + "_e",
-                                role = Role.ASSISTANT,
-                                text = "Falha de rede: ${e.message ?: "desconhecida"}"
-                            )
-                        } finally {
-                            isTyping = false
+                        if (!analyzeMode) {
+                            lastSeverity = null
+                            lastReport = null
                         }
+
+                        scope.launch {
+                            try {
+                                val res = chatApi.send(ChatRequest(payload))
+
+                                if (res.isSuccessful) {
+                                    val raw = res.body()?.string()
+                                    val text = raw
+                                        ?.replace("\\n", "\n")
+                                        ?.trim()
+
+                                    messages += MessageUi(
+                                        id = System.currentTimeMillis().toString() + "_a",
+                                        role = Role.ASSISTANT,
+                                        text = text.takeUnless { it.isNullOrBlank() } ?: "Servidor respondeu vazio (200)."
+                                    )
+                                } else {
+                                    val err = res.errorBody()?.string()
+                                    messages += MessageUi(
+                                        id = System.currentTimeMillis().toString() + "_e",
+                                        role = Role.ASSISTANT,
+                                        text = "Erro HTTP ${res.code()}: ${err ?: "sem corpo"}"
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                messages += MessageUi(
+                                    id = System.currentTimeMillis().toString() + "_e",
+                                    role = Role.ASSISTANT,
+                                    text = "Falha de rede no app: ${e.message ?: "desconhecida"}"
+                                )
+                            } finally {
+                                isTyping = false
+                            }
+                        }
+
                     }
-                }) {
-                    if (showSend) {
+                ) {
+                    if (canSend) {
                         Icon(Icons.Filled.Send, contentDescription = "Enviar", tint = Color(0xFF26A69A))
                     } else {
                         Icon(Icons.Filled.Mic, contentDescription = "Microfone", tint = Color(0xFF26A69A))
