@@ -30,6 +30,7 @@ private val LightColorScheme = lightColorScheme(
     secondary = brand950, // card home e chat popup
     onSecondary = neutral100, // texto card home
     tertiary = yellow50, // texto login/cadastro inferior
+    onTertiary = brand650, // cor dos icones perfil
     background = brand1200, //cor do fundo
     onBackground = brand900, //cor do texto de fundo
     surface = neutral100,
