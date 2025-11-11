@@ -16,16 +16,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Group
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,110 +50,183 @@ import com.example.guardia.R
 import com.example.guardia.ui.theme.GuardiaTheme
 
 @Composable
-fun PerfilScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF6EA9CE), // Azul claro em cima
-                        Color(0xFF1D4ED8)  // Azul escuro embaixo
-                    )
-                )
-            )
-    ) {
-        Column(
+fun PerfilScreen(
+    onItemClick: (String) -> Unit = {}
+) {
+    Scaffold(
+        bottomBar = {
+            CustomBottomAppBar(onItemClick = onItemClick)
+        },
+        containerColor = Color.Transparent
+    ) { innerPadding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 64.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // --- Seção da Imagem de Perfil ---
-            Box(contentAlignment = Alignment.BottomEnd) {
-                Image(
-                    painter = painterResource(id = R.drawable.livia), // Trocar pela imagem do usuário
-                    contentDescription = "Foto de Perfil",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(CircleShape)
-                        .border(4.dp, Color.White, CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-
-
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // --- Nome e Email do Usuário ---
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "Livia Oliveira",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "livia.oliveira@gmail.com",
-                    fontSize = 16.sp,
-                    color = Color.White.copy(alpha = 0.8f) // Cor branca com leve transparência
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // --- Botão Editar Perfil ---
-            Button(
-                onClick = { /* TODO: Handle Edit Profile click */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp),
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFBFDBFE).copy(alpha = 0.5f) // Azul claro com transparência
-                ),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.7f)),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                // AQUI: Trocamos Row por Box para ter controle total do alinhamento
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    // Ícone alinhado à esquerda
-                    Box(
-                        modifier = Modifier
-                            .size(45.dp) // Tamanho do círculo azul
-                            .background(color = Color(0xFF3B82F6), shape = CircleShape)
-                            .align(Alignment.CenterStart), // Alinha na esquerda e centraliza verticalmente
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Ícone de Perfil",
-                            tint = Color.White,
-                            modifier = Modifier.size(40.dp) // Tamanho do ícone (menor que o círculo)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFB4F5EF),
+                            Color(0xFF6EA9CE)
                         )
-                    }
-
-                    // Texto alinhado no centro absoluto do botão
-                    Text(
-                        text = "Editar Perfil",
-                        color = Color(0xFF1E40AF), // Azul escuro
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp,
-                        modifier = Modifier.align(Alignment.Center) // Alinha no centro do Box pai
                     )
+                )
+                .padding(innerPadding)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 32.dp, bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // --- Seção da Imagem de Perfil ---
+                Box(contentAlignment = Alignment.BottomEnd) {
+                    Image(
+                        painter = painterResource(id = R.drawable.livia),
+                        contentDescription = "Foto de Perfil",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(CircleShape)
+                            .border(4.dp, Color.White, CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // --- Nome e Email do Usuário ---
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Livia Oliveira",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF14265B)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "São Paulo/SP",
+                        fontSize = 16.sp,
+                        color = Color(0xFF14265B)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // --- Botões com ícones do drawable ---
+                Column(verticalArrangement = Arrangement.spacedBy(25.dp)) {
+                    ProfileButton(text = "Editar Perfil", iconPainter = painterResource(id = R.drawable.person))
+                    ProfileButton(text = "Senha e segurança", iconPainter = painterResource(id = R.drawable.shield_check))
+                    ProfileButton(text = "Salvos", iconPainter = painterResource(id = R.drawable.saved))
+                    ProfileButton(text = "Planos Guardiã", iconPainter = painterResource(id = R.drawable.star))
+                    ProfileButton(text = "Ajuda", iconPainter = painterResource(id = R.drawable.help))
                 }
             }
         }
     }
 }
 
+// --- COMPONENTES DOS BOTÕES DO MEIO DA TELA ---
+@Composable
+fun ProfileButton(text: String, iconPainter: Painter) {
+    ProfileButtonBase(text = text, iconContent = {
+
+        Image(painter = iconPainter, contentDescription = text, modifier = Modifier.size(50.dp))
+    })
+}
+
+@Composable
+fun ProfileButtonBase(text: String, iconContent: @Composable () -> Unit) {
+    Button(
+        onClick = { /* TODO: Handle button click */ },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        shape = RoundedCornerShape(30),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White.copy(alpha = 0.7f)
+        ),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f)),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .background(Color.Transparent, CircleShape)
+                    .align(Alignment.CenterStart),
+                contentAlignment = Alignment.Center
+            ) {
+                iconContent()
+            }
+            Text(
+                text = text,
+                color = Color(0xFF1E40AF),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
+}
+
+// --- COMPONENTE DA BARRA DE NAVEGAÇÃO CUSTOMIZADA ---
+@Composable
+fun CustomBottomAppBar(onItemClick: (String) -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp) // Altura total da área da barra
+
+    ) {
+        // A barra cinza com cantos arredondados, desenhada atrás
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 20.dp) // Deixa espaço para o FAB "saltar" para fora
+                .background(
+                    color = Color(0xFFF0F4F8),
+                    shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                )
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Ícones
+                IconButton(onClick = { onItemClick("perfil") }, modifier = Modifier.weight(1f)) {
+                    Icon(Icons.Outlined.Person, contentDescription = "Perfil", tint = Color(0xFF0E3B5E))
+                }
+                IconButton(onClick = { onItemClick("chat") }, modifier = Modifier.weight(1f)) {
+                    Icon(Icons.Outlined.ChatBubbleOutline, contentDescription = "Chat", tint = Color(0xFF0E3B5E))
+                }
+                // Espaço vazio para o FAB
+                Spacer(modifier = Modifier.width(60.dp))
+                IconButton(onClick = { onItemClick("grupo") }, modifier = Modifier.weight(1f)) {
+                    Icon(Icons.Outlined.Group, contentDescription = "Grupo", tint = Color(0xFF0E3B5E))
+                }
+                IconButton(onClick = { onItemClick("config") }, modifier = Modifier.weight(1f)) {
+                    Icon(Icons.Outlined.Settings, contentDescription = "Configurações", tint = Color(0xFF0E3B5E))
+                }
+            }
+        }
+
+        // O FAB, desenhado por último para ficar na frente
+        FloatingActionButton(
+            onClick = { onItemClick("home") },
+            modifier = Modifier.align(Alignment.TopCenter), // Alinhado ao topo e centro do container
+            shape = CircleShape,
+            containerColor = Color(0xFF0E3B5E),
+            contentColor = Color.White
+        ) {
+            Icon(imageVector = Icons.Default.Home, contentDescription = "Início")
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
 fun PerfilScreenPreview() {
-    GuardiaTheme() {
+    GuardiaTheme {
         PerfilScreen()
     }
 }
