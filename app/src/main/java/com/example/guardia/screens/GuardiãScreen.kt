@@ -97,7 +97,7 @@ private fun TypingBubble() {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
-                // 🌟 Estrela dourada com rotação e brilho
+
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = "Estrela animada",

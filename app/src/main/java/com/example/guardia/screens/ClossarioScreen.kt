@@ -1,4 +1,3 @@
-
 package com.example.guardia.screens
 
 import androidx.compose.foundation.background
@@ -18,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -167,7 +167,7 @@ fun GuardiaTipsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(1.5.dp)
-                            .background(Color(0x4D4A7C8B)) // 30% opacity
+                            .background(Color(0x4D4A7C8B))
                             .padding(horizontal = 20.dp)
                     )
                 }
@@ -353,4 +353,51 @@ fun TipDialog(
             }
         }
     }
+}
+
+// PREVIEW
+@Preview(
+    name = "Tela de Dicas - Modo Claro",
+    showBackground = true,
+    showSystemUi = true
+)
+@Composable
+fun GuardiaTipsScreenPreview() {
+    GuardiaTipsScreen()
+}
+
+@Preview(
+    name = "Card de Dica",
+    showBackground = true
+)
+@Composable
+fun TipCardPreview() {
+    TipCard(
+        tip = TipItem(
+            id = 1,
+            title = "Cuidados nas\nRedes Sociais",
+            icon = Icons.Default.PhoneAndroid,
+            iconColor = Color(0xFF3B82F6),
+            content = "Conteúdo de exemplo"
+        ),
+        onClick = {}
+    )
+}
+
+@Preview(
+    name = "Dialog de Dica",
+    showBackground = true
+)
+@Composable
+fun TipDialogPreview() {
+    TipDialog(
+        tip = TipItem(
+            id = 1,
+            title = "Cuidados nas Redes Sociais",
+            icon = Icons.Default.PhoneAndroid,
+            iconColor = Color(0xFF3B82F6),
+            content = "• Nunca compartilhe informações pessoais\n• Configure privacidade\n• Cuidado com desconhecidos"
+        ),
+        onDismiss = {}
+    )
 }
