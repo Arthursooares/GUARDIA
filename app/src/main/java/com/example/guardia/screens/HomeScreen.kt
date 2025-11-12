@@ -1,9 +1,13 @@
 package com.example.guardia.screens
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -12,29 +16,163 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.compose.foundation.Image
 import com.example.guardia.R
+import androidx.compose.ui.draw.scale
+
+
+// ---------- Paleta ----------
+private val AzureLight = Color(0xFFE8F5FF)
+private val AzureMid   = Color(0xFFD3ECFF)
+private val TitleDark  = Color(0xFF0E3B5E)
+private val PrimaryTeal = Color(0xFF33B2B2)
+private val PrimaryBlue = Color(0xFF0E6D90)
+private val IconBg     = Color(0xFFE7F1FA) // reservado caso queira usar
+private val CardStroke = Color(0xFFE1ECF7)
+
+// ---------- Card com IMAGEM (com tamanho/padding/offset individual) ----------
+@Composable
+private fun ImageCard(
+    title: String,
+    @DrawableRes imageRes: Int,
+    onClick: () -> Unit,
+    imageSize: Dp = 70.dp,          // tamanho do espaço reservado
+    imageScale: Float = 1.0f,       // 🔹 aumenta a imagem dentro do espaço
+    imagePadding: Dp = 0.dp,
+    imageOffsetY: Dp = 0.dp,
+    imageOffsetX: Dp = 0.dp,
+    cardHeight: Dp = 84.dp,
+    textStartPadding: Dp = 110.dp
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(cardHeight)
+            .shadow(8.dp, RoundedCornerShape(20.dp), clip = false)
+            .background(Color.White, RoundedCornerShape(20.dp))
+            .border(1.dp, CardStroke, RoundedCornerShape(20.dp))
+            .clickable { onClick() }
+    ) {
+        // 🔹 imagem à esquerda, cresce dentro do espaço com scale()
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset(x = imageOffsetX, y = imageOffsetY) // 🔹 agora age antes do padding
+                .padding(start = 16.dp)
+                .size(imageSize),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(imageRes),
+                contentDescription = title,
+                modifier = Modifier
+                    .scale(imageScale)
+                    .padding(imagePadding),
+                contentScale = ContentScale.Fit
+            )
+        }
+
+        // 🔹 texto à direita
+        Text(
+            text = title,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = TitleDark,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = textStartPadding)
+        )
+    }
+}
+
+
+// Wrapper para o card de Dicas
+@Composable
+private fun TipsCard(
+    @DrawableRes imageRes: Int,
+    onClick: () -> Unit,
+    imageSize: Dp = 70.dp,
+    imageScale: Float = 1.0f,
+    imagePadding: Dp = 0.dp,
+    imageOffsetY: Dp = 0.dp,
+    cardHeight: Dp = 84.dp,
+    textStartPadding: Dp = 110.dp
+) {
+    ImageCard(
+        title = "Dicas da Guardiã",
+        imageRes = imageRes,
+        onClick = onClick,
+        imageSize = imageSize,
+        imageScale = imageScale,
+        imagePadding = imagePadding,
+        imageOffsetY = imageOffsetY,
+        cardHeight = cardHeight,
+        textStartPadding = textStartPadding
+    )
+}
 
 
 
+// ---------- Card com ÍCONE (mantido caso queira usar em outros lugares) ----------
+@Composable
+private fun ShortcutCard(
+    title: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+            .shadow(elevation = 6.dp, shape = RoundedCornerShape(18.dp), clip = false)
+            .background(Color.White, shape = RoundedCornerShape(18.dp))
+            .border(1.dp, CardStroke, RoundedCornerShape(18.dp))
+            .clickable { onClick() }
+            .padding(horizontal = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(IconBg),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon, contentDescription = title, tint = TitleDark)
+        }
+        Spacer(Modifier.width(12.dp))
+        Text(
+            text = title,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = TitleDark
+        )
+    }
+}
 
+data class HomeCardData(val title: String, val icon: ImageVector)
+
+// ---------- TELA ----------
 @Composable
 fun HomeScreen(
     navController: NavHostController,
@@ -46,35 +184,24 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color(0xFFE8F5FF),
-                        Color(0xFFD3ECFF),
-                        Color(0xFFE8F5FF)
-                    )
-                )
-            )
+            .background(Brush.verticalGradient(listOf(AzureLight, AzureMid, AzureLight)))
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Column(Modifier.fillMaxSize()) {
+
+            // Top Bar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                    .padding(top = 16.dp, start = 12.dp, end = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(onClick = onMenuClick) {
-                    Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = "Menu",
-                        tint = Color(0xFF0E3B5E)
-                    )
+                    Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = TitleDark)
                 }
             }
 
+            // Conteúdo (scroll)
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -82,28 +209,30 @@ fun HomeScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = "Bem vindo(a), $userName!",
+                    text = buildAnnotatedString {
+                        append("Bem vindo(a), ")
+                        withStyle(SpanStyle(color = PrimaryBlue, fontWeight = FontWeight.Bold)) {
+                            append(userName)
+                        }
+                        append("!")
+                    },
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF0E3B5E),
-                    modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
+                    color = TitleDark,
+                    modifier = Modifier.padding(top = 6.dp, bottom = 12.dp)
                 )
 
-                // 🔹 CARD PRINCIPAL
+                // Card principal
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(160.dp)
+                        .height(180.dp)
+                        .shadow(8.dp, RoundedCornerShape(28.dp), clip = false)
                         .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    Color(0xFF33B2B2),
-                                    Color(0xFF0E6D90)
-                                )
-                            ),
-                            shape = RoundedCornerShape(24.dp)
+                            brush = Brush.horizontalGradient(listOf(PrimaryTeal, PrimaryBlue)),
+                            shape = RoundedCornerShape(28.dp)
                         )
-                        .padding(16.dp)
+                        .padding(18.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),
@@ -111,201 +240,152 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp)
                         ) {
                             Text(
-                                text = "Converse com a Guardiã",
+                                "Converse com a Guardiã",
                                 color = Color.White,
-                                fontSize = 16.sp,
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(Modifier.height(6.dp))
                             Text(
-                                text = "Algum problema ou dúvida? vamos resolver isso juntos!",
-                                color = Color.White.copy(alpha = 0.9f),
-                                fontSize = 12.sp
+                                "Algum problema ou dúvida?\nVamos resolver isso juntas!",
+                                color = Color.White.copy(alpha = 0.95f),
+                                fontSize = 12.sp,
+                                lineHeight = 16.sp
                             )
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(Modifier.height(12.dp))
                             Button(
                                 onClick = onChatClick,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFE8F5FF)
-                                ),
+                                colors = ButtonDefaults.buttonColors(containerColor = AzureLight),
                                 shape = RoundedCornerShape(50),
-                                contentPadding = PaddingValues(horizontal = 18.dp, vertical = 4.dp)
+                                contentPadding = PaddingValues(horizontal = 18.dp, vertical = 6.dp),
+                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
                             ) {
                                 Text(
-                                    text = "Comece agora",
-                                    color = Color(0xFF0E6D90),
+                                    "Comece agora",
+                                    color = PrimaryBlue,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.SemiBold
                                 )
                             }
                         }
 
-                        // placeholder para personagem
                         Box(
                             modifier = Modifier
-                                .width(90.dp)
-                                .clickable {
-                                // }
-                                }
-                                .fillMaxHeight(),
+                                .fillMaxHeight()
+                                .width(110.dp),
                             contentAlignment = Alignment.BottomEnd
                         ) {
-                            Box(
+                            Image(
+                                painter = painterResource(R.drawable.personagem),
+                                contentDescription = "Personagem Guardiã",
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(250.dp)
-                                    .background(Color.Transparent)
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.personagem),
-                                    contentDescription = "Personagem Guardiã",
-                                    modifier = Modifier
-                                        .align(Alignment.CenterEnd) // coloca à direita
-                                        .width(180.dp)               // largura ajustada
-                                        .height(240.dp),             // altura ajustada
-                                    contentScale = ContentScale.Fit  // mantém proporção
-                                )
-                            }
-
-
+                                    .fillMaxHeight()
+                                    .aspectRatio(0.6f),
+                                contentScale = ContentScale.Fit
+                            )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(Modifier.height(20.dp))
 
-                val cards: List<HomeCardData> = remember {
-                    listOf(
-                        HomeCardData("Dicas de segurança", Icons.Filled.Security),
-                        HomeCardData("Meus Relatórios", Icons.Filled.Description),
-                        HomeCardData("Upgrade Guardiã", Icons.Filled.Star),
-                        HomeCardData("Feedbacks", Icons.Filled.ChatBubble)
-                    )
-                }
+                // ----- Atalhos com IMAGEM (ajustes por item) -----
+                // ----- Atalhos com IMAGEM (ajustados para o protótipo) -----
+                TipsCard(
+                    imageRes = R.drawable.ic_dicas,
+                    onClick = { onItemClick("Dicas da Guardiã") },
+                    imageSize = 72.dp,
+                    imageScale = 1.3f, // 🔹 aumenta 30%
+                    imageOffsetY = 0.dp
+                )
+                Spacer(Modifier.height(14.dp))
 
-                cards.forEach { item ->
-                    HomeListItem(
-                        title = item.title,
-                        icon = item.icon,
-                        onClick = { onItemClick(item.title) }
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
+                ImageCard(
+                    title = "Meus Relatórios",
+                    imageRes = R.drawable.ic_relatorios,
+                    onClick = { onItemClick("Meus Relatórios") },
+                    imageSize = 70.dp,
+                    imageScale = 1.0f, // 🔹 aumenta 40%
+                    imageOffsetY = 0.dp
+                )
+                Spacer(Modifier.height(14.dp))
 
-                Spacer(modifier = Modifier.height(80.dp))
-            }
+                ImageCard(
+                    title = "Upgrade Guardiã",
+                    imageRes = R.drawable.estrela,
+                    onClick = { onItemClick("Upgrade Guardiã") },
+                    imageSize = 74.dp,
+                    imageScale = 1.6f,
+                    imageOffsetX = (-3).dp,   // 🔹 move a estrela mais pra esquerda
+                    imageOffsetY = (-1).dp
+                )
+                Spacer(Modifier.height(14.dp))
 
-            // 🔹 BOTTOM NAV
-            NavigationBar(
-                containerColor = Color.White,
-                tonalElevation = 8.dp
-            ) {
+                ImageCard(
+                    title = "Feedbacks",
+                    imageRes = R.drawable.ic_feedbacks,
+                    onClick = { onItemClick("Feedbacks") },
+                    imageSize = 70.dp,
+                    imageScale = 1.8f,
+                    imageOffsetY = 0.dp
+                )
+
+
+                Spacer(Modifier.height(16.dp))
+            } // fecha scroll
+
+            // Bottom Bar (fora do scroll)
+            NavigationBar(containerColor = Color.White, tonalElevation = 10.dp) {
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { /* esquerdo 1 */ },
+                    icon = { Icon(Icons.Filled.ChatBubble, contentDescription = "Mensagens", tint = Color(0xFF9AA9B5)) },
+                    label = { Text("Feed", fontSize = 10.sp) }
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { /* esquerdo 2 */ },
+                    icon = { Icon(Icons.Filled.Description, contentDescription = "Itens", tint = Color(0xFF9AA9B5)) },
+                    label = { Text("Itens", fontSize = 10.sp) }
+                )
                 NavigationBarItem(
                     selected = true,
-                    onClick = {},
+                    onClick = { /* Home */ },
                     icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Home,
-                            contentDescription = "Início",
-                            tint = Color(0xFF0E3B5E)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .background(Brush.verticalGradient(listOf(AzureMid, AzureLight)))
+                                .border(1.dp, CardStroke, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Filled.Home, contentDescription = "Início", tint = TitleDark)
+                        }
                     },
                     label = { Text("Início", fontSize = 10.sp) }
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = {},
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Description,
-                            contentDescription = "Relatórios",
-                            tint = Color(0xFF9AA9B5)
-                        )
-                    },
-                    label = { Text("Relatórios", fontSize = 10.sp) }
+                    onClick = { onItemClick("guardia") },
+                    icon = { Icon(Icons.Filled.Star, contentDescription = "Guardiã", tint = Color(0xFF9AA9B5)) },
+                    label = { Text("Guardiã", fontSize = 10.sp) }
                 )
-
                 NavigationBarItem(
                     selected = false,
-                    onClick = { onItemClick("guardia") }, // ✅ Navega para GuardiaScreen
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Star,
-                            contentDescription = "Guardiã",
-                            tint = Color(0xFF9AA9B5)
-                        )
-                    },
-                    label = { Text("Guardiã") }
-                )
-
-
-                NavigationBarItem(
-                    selected = false,
-                    onClick = {},
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Person,
-                            contentDescription = "Perfil",
-                            tint = Color(0xFF9AA9B5)
-                        )
-                    },
+                    onClick = { /* Perfil */ },
+                    icon = { Icon(Icons.Filled.Person, contentDescription = "Perfil", tint = Color(0xFF9AA9B5)) },
                     label = { Text("Perfil", fontSize = 10.sp) }
                 )
             }
         }
     }
 }
-
-
-@Composable
-private fun HomeListItem(
-    title: String,
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(62.dp)
-            .background(Color.White, shape = RoundedCornerShape(16.dp))
-            .clickable { onClick() }
-            .padding(horizontal = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .background(Color(0xFFD3ECFF), shape = RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = Color(0xFF0E3B5E)
-            )
-        }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Text(
-            text = title,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF0E3B5E)
-        )
-    }
-}
-
-
-
-data class HomeCardData(
-    val title: String,
-    val icon: ImageVector
-)
-
 
 @Preview(showBackground = true, backgroundColor = 0xFFE8F5FF)
 @Composable
