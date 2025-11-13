@@ -1,13 +1,16 @@
 package com.example.guardia.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -18,14 +21,13 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
-
+import com.example.guardia.R
 
 data class TipItem(
     val id: Int,
@@ -40,7 +42,6 @@ data class TipItem(
 fun GuardiaTipsScreen(
     onBackClick: () -> Unit = {}
 ) {
-    // Dicas principais (carrossel)
     val tips = listOf(
         TipItem(
             id = 1,
@@ -87,7 +88,6 @@ fun GuardiaTipsScreen(
         )
     )
 
-    // Tip FAQ separada (para o card de baixo abrir em diálogo)
     val faqTip = TipItem(
         id = 5,
         title = "Perguntas Frequentes",
@@ -102,19 +102,12 @@ fun GuardiaTipsScreen(
     )
 
     var showFaqDialog by remember { mutableStateOf(false) }
-
-    // Estado do pager (carrossel)
     val pagerState = rememberPagerState(initialPage = 0) { tips.size }
 
-    // Cores de fundo por página (pra ficar parecido com o protótipo)
     val pageColors = listOf(
-        // redes sociais
         Pair(Color(0xFF9FE2EE), Color(0xFF2563A7)),
-        // jogos online
         Pair(Color(0xFF7DD4E5), Color(0xFFFFB020)),
-        // comunicação familiar
         Pair(Color(0xFFFFD166), Color(0xFF2563A7)),
-        // glossário grooming
         Pair(Color(0xFF9FE2EE), Color(0xFF7C3AED))
     )
 
@@ -123,38 +116,27 @@ fun GuardiaTipsScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF9FE2EE),
-                        Color(0xFF7DD4E5)
-                    )
+                    colors = listOf(Color(0xFF9FE2EE), Color(0xFF7DD4E5))
                 )
             )
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             // ===== Header =====
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(
-                                Color(0xFF9FE2EE),
-                                Color(0xFF7DD4E5)
-                            )
+                            colors = listOf(Color(0xFF9FE2EE), Color(0xFF7DD4E5))
                         )
                     )
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 20.dp)
                     ) {
-
                         IconButton(
                             onClick = onBackClick,
                             modifier = Modifier.align(Alignment.CenterStart)
@@ -230,15 +212,10 @@ fun GuardiaTipsScreen(
                         .fillMaxWidth()
                         .fillMaxHeight(0.95f),
                     shape = RoundedCornerShape(32.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                 ) {
-                    // Fundo em duas cores lembrando o protótipo
-                    Row(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
+                    Row(modifier = Modifier.fillMaxSize()) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -251,17 +228,15 @@ fun GuardiaTipsScreen(
                                     .padding(24.dp),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                // Título
                                 Text(
-                                    text = tip.title.replace("\n", "\n"),
+                                    text = tip.title,
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color(0xFF111827),
                                     lineHeight = 28.sp
                                 )
 
-                                // Aqui entraria a ilustração da Guardiã do seu Figma
-                                // Troque esse Box por uma Image(painterResource(...)) depois.
+                                // ==== AQUI ENTRA A IMAGEM ====
                                 Surface(
                                     shape = RoundedCornerShape(24.dp),
                                     color = Color(0x33FFFFFF),
@@ -273,18 +248,18 @@ fun GuardiaTipsScreen(
                                         modifier = Modifier.fillMaxSize(),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Icon(
-                                            imageVector = tip.icon,
-                                            contentDescription = tip.title,
-                                            tint = tip.iconColor,
-                                            modifier = Modifier.size(64.dp)
+                                        Image(
+                                            painter = painterResource(id = R.drawable.guardia_celular),
+                                            contentDescription = "Guardiã com celular",
+                                            modifier = Modifier
+                                                .fillMaxWidth(0.9f)
+                                                .height(160.dp)
                                         )
                                     }
                                 }
                             }
                         }
 
-                        // Barra colorida da direita
                         Box(
                             modifier = Modifier
                                 .width(72.dp)
@@ -297,7 +272,7 @@ fun GuardiaTipsScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // ===== Indicadores de página (bolinhas) =====
+            // ===== Indicadores =====
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -319,16 +294,14 @@ fun GuardiaTipsScreen(
                 }
             }
 
-            // ===== Card "Dúvidas sobre a Guardiã?" (FAQ) =====
+            // ===== FAQ =====
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
                     .clickable { showFaqDialog = true },
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFE5ECFF)
-                ),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE5ECFF)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Row(
@@ -338,9 +311,7 @@ fun GuardiaTipsScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Dúvidas sobre a Guardiã?",
                             fontSize = 14.sp,
@@ -363,7 +334,7 @@ fun GuardiaTipsScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // ===== Bottom navigation (ícones) – fake / visual =====
+            // ===== Bottom Nav =====
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -380,17 +351,11 @@ fun GuardiaTipsScreen(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // ===== Dialog de FAQ =====
         if (showFaqDialog) {
-            TipDialog(
-                tip = faqTip,
-                onDismiss = { showFaqDialog = false }
-            )
+            TipDialog(tip = faqTip, onDismiss = { showFaqDialog = false })
         }
     }
 }
-
-// ---------- Dialog reaproveitado ----------
 
 @Composable
 fun TipDialog(
@@ -400,9 +365,7 @@ fun TipDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp)
@@ -453,9 +416,7 @@ fun TipDialog(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2563A7)
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563A7)),
                     contentPadding = PaddingValues(vertical = 14.dp)
                 ) {
                     Text(
@@ -469,13 +430,7 @@ fun TipDialog(
     }
 }
 
-// ---------- PREVIEWS ----------
-
-@Preview(
-    name = "Tela de Dicas - Carrossel",
-    showBackground = true,
-    showSystemUi = true
-)
+@Preview(name = "Tela de Dicas - Carrossel", showBackground = true, showSystemUi = true)
 @Composable
 fun GuardiaTipsScreenPreview() {
     GuardiaTipsScreen()
