@@ -21,6 +21,7 @@ fun AppNavGraph(navController: NavHostController) {
             )
         }
 
+
         // 🟡 Login
         composable("login") {
             LoginScreen(
@@ -52,6 +53,12 @@ fun AppNavGraph(navController: NavHostController) {
         composable("guardia") {
             GuardiaScreen()
         }
-        
+
+        composable("tips") {
+            GuardiaTipsScreen(onBackClick = { navController.popBackStack() })
+        }
+
+
     }
+
 }

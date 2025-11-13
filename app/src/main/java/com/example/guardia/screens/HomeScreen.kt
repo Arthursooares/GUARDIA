@@ -294,15 +294,17 @@ fun HomeScreen(
 
                 Spacer(Modifier.height(20.dp))
 
-                // ----- Atalhos com IMAGEM (ajustes por item) -----
-                // ----- Atalhos com IMAGEM (ajustados para o protótipo) -----
+                // ----- Card "Dicas da Guardiã" -> navega para a tela de dicas -----
                 TipsCard(
                     imageRes = R.drawable.ic_dicas,
-                    onClick = { onItemClick("Dicas da Guardiã") },
+                    onClick = {
+                        navController.navigate("tips")   // 👈 AQUI faz a navegação
+                    },
                     imageSize = 72.dp,
-                    imageScale = 1.3f, // 🔹 aumenta 30%
+                    imageScale = 1.3f,
                     imageOffsetY = 0.dp
                 )
+
                 Spacer(Modifier.height(14.dp))
 
                 ImageCard(
@@ -310,7 +312,7 @@ fun HomeScreen(
                     imageRes = R.drawable.ic_relatorios,
                     onClick = { onItemClick("Meus Relatórios") },
                     imageSize = 70.dp,
-                    imageScale = 1.0f, // 🔹 aumenta 40%
+                    imageScale = 1.0f,
                     imageOffsetY = 0.dp
                 )
                 Spacer(Modifier.height(14.dp))
@@ -321,7 +323,7 @@ fun HomeScreen(
                     onClick = { onItemClick("Upgrade Guardiã") },
                     imageSize = 74.dp,
                     imageScale = 1.6f,
-                    imageOffsetX = (-3).dp,   // 🔹 move a estrela mais pra esquerda
+                    imageOffsetX = (-3).dp,
                     imageOffsetY = (-1).dp
                 )
                 Spacer(Modifier.height(14.dp))
@@ -335,11 +337,10 @@ fun HomeScreen(
                     imageOffsetY = 0.dp
                 )
 
-
                 Spacer(Modifier.height(16.dp))
-            } // fecha scroll
+            }
 
-            // Bottom Bar (fora do scroll)
+            // Bottom Bar
             NavigationBar(containerColor = Color.White, tonalElevation = 10.dp) {
                 NavigationBarItem(
                     selected = false,
@@ -386,6 +387,7 @@ fun HomeScreen(
         }
     }
 }
+
 
 @Preview(showBackground = true, backgroundColor = 0xFFE8F5FF)
 @Composable
