@@ -51,7 +51,8 @@ import com.example.guardia.ui.theme.GuardiaTheme
 
 @Composable
 fun PerfilScreen(
-    onItemClick: (String) -> Unit = {}
+    onItemClick: (String) -> Unit = {},
+    onNavigateToEdit: () -> Unit // AQUI: Adicionamos o novo parâmetro
 ) {
     Scaffold(
         bottomBar = {
@@ -114,7 +115,8 @@ fun PerfilScreen(
 
                 // --- Botões com ícones do drawable ---
                 Column(verticalArrangement = Arrangement.spacedBy(25.dp)) {
-                    ProfileButton(text = "Editar Perfil", iconPainter = painterResource(id = R.drawable.person))
+                    // AQUI: Passamos a ação de clique para o botão Editar Perfil
+                    ProfileButton(text = "Editar Perfil", iconPainter = painterResource(id = R.drawable.person), onClick = onNavigateToEdit)
                     ProfileButton(text = "Senha e segurança", iconPainter = painterResource(id = R.drawable.shield_check))
                     ProfileButton(text = "Salvos", iconPainter = painterResource(id = R.drawable.saved))
                     ProfileButton(text = "Planos Guardiã", iconPainter = painterResource(id = R.drawable.star))
@@ -127,21 +129,20 @@ fun PerfilScreen(
 
 // --- COMPONENTES DOS BOTÕES DO MEIO DA TELA ---
 @Composable
-fun ProfileButton(text: String, iconPainter: Painter) {
-    ProfileButtonBase(text = text, iconContent = {
-
+fun ProfileButton(text: String, iconPainter: Painter, onClick: () -> Unit = {}) {
+    ProfileButtonBase(text = text, onClick = onClick, iconContent = {
         Image(painter = iconPainter, contentDescription = text, modifier = Modifier.size(50.dp))
     })
 }
 
 @Composable
-fun ProfileButtonBase(text: String, iconContent: @Composable () -> Unit) {
+fun ProfileButtonBase(text: String, onClick: () -> Unit, iconContent: @Composable () -> Unit) {
     Button(
-        onClick = { /* TODO: Handle button click */ },
+        onClick = onClick, // AQUI: Usamos a ação de clique recebida
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp),
-        shape = RoundedCornerShape(30),
+        shape = RoundedCornerShape(35),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White.copy(alpha = 0.7f)
         ),
@@ -227,6 +228,6 @@ fun CustomBottomAppBar(onItemClick: (String) -> Unit) {
 @Composable
 fun PerfilScreenPreview() {
     GuardiaTheme {
-        PerfilScreen()
+        PerfilScreen(onNavigateToEdit = {}) // Adicionado para o preview não quebrar
     }
 }

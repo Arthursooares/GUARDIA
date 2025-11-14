@@ -58,6 +58,17 @@ fun AppNavGraph(navController: NavHostController) {
             GuardiaTipsScreen(onBackClick = { navController.popBackStack() })
         }
 
+        // AQUI: Nova rota para a tela de edição
+        composable("editProfile") {
+            EditScreen()
+        }
+
+        // AQUI: Rota para a tela de perfil
+        composable("perfil") {
+             PerfilScreen(onNavigateToEdit = {
+                 navController.navigate("editProfile")
+             })
+        }
 
     }
 
