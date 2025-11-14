@@ -1,8 +1,11 @@
 package com.example.guardia.screens
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -17,10 +20,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,86 +36,191 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.guardia.R
 
+// ---------- Paleta / cores usadas também na bottom bar ----------
+private val AzureLight = Color(0xFFE8F5FF)
+private val AzureMid   = Color(0xFFD3ECFF)
+private val TitleDark  = Color(0xFF0E3B5E)
+private val PrimaryTeal = Color(0xFF33B2B2)
+private val PrimaryBlue = Color(0xFF0E6D90)
+private val CardStroke = Color(0xFFE1ECF7)
+
+// ---------- Modelo das dicas ----------
 data class TipItem(
     val id: Int,
     val title: String,
-    val icon: ImageVector,
-    val iconColor: Color,
-    val content: String
+    val content: String,
+    @DrawableRes val imageRes: Int
 )
 
+@Composable
+private fun GuardiaBottomBar(
+    currentRoute: String,
+    onItemClick: (String) -> Unit
+) {
+    val items = listOf(
+        BottomNavItem("feed", "Feed", Icons.Filled.ChatBubble),
+        BottomNavItem("itens", "Itens", Icons.Filled.Description),
+        BottomNavItem("home", "Início", Icons.Filled.Home, isCenter = true),
+        BottomNavItem("guardia", "Guardiã", Icons.Filled.Star),
+        BottomNavItem("perfil", "Perfil", Icons.Filled.Person)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // "Pílula" de fundo da bottom bar (glass / card moderno)
+        Surface(
+            shape = RoundedCornerShape(26.dp),
+            color = Color.White.copy(alpha = 0.96f),
+            shadowElevation = 14.dp,
+            tonalElevation = 0.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(62.dp)
+        ) {
+            NavigationBar(
+                containerColor = Color.Transparent,
+                tonalElevation = 0.dp
+            ) {
+                items.forEach { item ->
+                    val selected = currentRoute == item.route
+
+                    NavigationBarItem(
+                        selected = selected,
+                        onClick = { onItemClick(item.route) },
+                        icon = {
+                            if (item.isCenter) {
+                                // Botão central flutuante
+                                // Botão central flutuante — AGORA MAIS BAIXO
+                                Box(
+                                    modifier = Modifier
+                                        .offset(y = (5).dp)   // ⬅️ antes era -18.dp
+                                        .size(64.dp)
+                                        .shadow(
+                                            elevation = 16.dp,
+                                            shape = CircleShape,
+                                            clip = false
+                                        )
+                                        .clip(CircleShape)
+                                        .background(
+                                            Brush.verticalGradient(
+                                                listOf(PrimaryTeal, PrimaryBlue)
+                                            )
+                                        )
+                                        .border(1.dp, Color.White.copy(alpha = 0.7f), CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = item.label,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                }
+
+                            } else {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = item.label,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                        },
+                        label = {
+                            Text(
+                                text = item.label,
+                                fontSize = 10.sp
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = PrimaryBlue,
+                            selectedTextColor = PrimaryBlue,
+                            indicatorColor = Color(0xFFE6F0FB),
+                            unselectedIconColor = Color(0xFF9AA9B5),
+                            unselectedTextColor = Color(0xFF9AA9B5)
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+
+// ---------- Tela de Dicas ----------
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun GuardiaTipsScreen(
     onBackClick: () -> Unit = {}
 ) {
+    // 🔹 AGORA SÃO 4 CARDS
     val tips = listOf(
         TipItem(
             id = 1,
-            title = "Cuidados nas\nRedes Sociais",
-            icon = Icons.Default.PhoneAndroid,
-            iconColor = Color(0xFF3B82F6),
-            content = "• Nunca compartilhe informações pessoais como endereço, telefone ou escola\n\n" +
-                    "• Configure suas redes sociais como privadas\n\n" +
-                    "• Cuidado ao aceitar solicitações de amizade de desconhecidos\n\n" +
-                    "• Pense bem antes de postar fotos ou informações"
-        ),
-        TipItem(
-            id = 2,
-            title = "Perigos dos\nJogos Online",
-            icon = Icons.Default.SportsEsports,
-            iconColor = Color(0xFF3B82F6),
+            title = "Perigos dos\njogos online",
             content = "• Nunca aceite convites para conversar fora do jogo\n\n" +
                     "• Use apelidos, não seu nome real\n\n" +
                     "• Não compartilhe dados pessoais com outros jogadores\n\n" +
-                    "• Bloqueie e reporte comportamentos abusivos"
+                    "• Bloqueie e reporte comportamentos abusivos",
+            imageRes = R.drawable.guardia_videogame
         ),
         TipItem(
-            id = 3,
-            title = "Comunicação\nFamiliar",
-            icon = Icons.Default.People,
-            iconColor = Color(0xFFFFB020),
+            id = 2,
+            title = "Comunicação\nfamiliar",
             content = "• Converse abertamente com sua família sobre suas experiências online\n\n" +
                     "• Compartilhe o que você faz na internet\n\n" +
                     "• Peça ajuda quando se sentir desconfortável\n\n" +
-                    "• Mantenha um diálogo saudável e honesto"
+                    "• Mantenha um diálogo saudável e honesto",
+            imageRes = R.drawable.guardia_familia
+        ),
+        TipItem(
+            id = 3,
+            title = "Cuidados nas\nRedes Sociais",
+            content = "• Nunca compartilhe informações pessoais como endereço, telefone ou escola\n\n" +
+                    "• Configure suas redes sociais como privadas\n\n" +
+                    "• Cuidado ao aceitar solicitações de amizade de desconhecidos\n\n" +
+                    "• Pense bem antes de postar fotos ou informações",
+            imageRes = R.drawable.guardia_celular
         ),
         TipItem(
             id = 4,
             title = "Glossário\nGrooming",
-            icon = Icons.Default.MenuBook,
-            iconColor = Color(0xFF7C3AED),
-            content = "Grooming é o processo onde adultos mal-intencionados criam vínculos emocionais " +
+            content = "Grooming é o processo em que adultos mal-intencionados criam vínculos emocionais " +
                     "com crianças e adolescentes para exploração sexual.\n\nSinais de alerta:\n" +
                     "• Elogios excessivos\n" +
                     "• Pedidos de segredo\n" +
                     "• Presentes inesperados\n" +
                     "• Conversas com conteúdo sexual\n" +
-                    "• Pedidos de fotos íntimas"
+                    "• Pedidos de fotos íntimas",
+            imageRes = R.drawable.guardia_escudo // pode trocar por outra ilustr. depois
         )
     )
 
     val faqTip = TipItem(
         id = 5,
         title = "Perguntas Frequentes",
-        icon = Icons.Default.Help,
-        iconColor = Color(0xFF7C3AED),
         content = "• Como fazer uma denúncia?\n" +
                 "• O que fazer se eu for vítima?\n" +
                 "• Como proteger minha privacidade online?\n" +
                 "• Onde buscar ajuda profissional?\n" +
                 "• Como conversar com meus pais sobre isso?\n\n" +
-                "Entre em contato com a Guardiã para mais informações e suporte!"
+                "Entre em contato com a Guardiã para mais informações e suporte!",
+        imageRes = R.drawable.guardia_celular // só pra não quebrar, não é exibida no diálogo
     )
 
     var showFaqDialog by remember { mutableStateOf(false) }
     val pagerState = rememberPagerState(initialPage = 0) { tips.size }
 
+    // 🔹 4 cores, uma pra cada card (ordem bate com os 4 tips)
     val pageColors = listOf(
-        Pair(Color(0xFF9FE2EE), Color(0xFF2563A7)),
-        Pair(Color(0xFF7DD4E5), Color(0xFFFFB020)),
-        Pair(Color(0xFFFFD166), Color(0xFF2563A7)),
-        Pair(Color(0xFF9FE2EE), Color(0xFF7C3AED))
+        Color(0xFF063C80), // jogos
+        Color(0xFFFFD166), // comunicação
+        Color(0xFF00B6C9), // redes
+        Color(0xFF7C3AED)  // grooming
     )
 
     Box(
@@ -189,7 +301,6 @@ fun GuardiaTipsScreen(
                             .fillMaxWidth()
                             .height(1.5.dp)
                             .background(Color(0x4D4A7C8B))
-                            .padding(horizontal = 20.dp)
                     )
                 }
             }
@@ -204,7 +315,7 @@ fun GuardiaTipsScreen(
                     .weight(1f)
             ) { page ->
                 val tip = tips[page]
-                val (leftColor, rightColor) = pageColors[page]
+                val bgColor = pageColors[page]
 
                 Card(
                     modifier = Modifier
@@ -212,71 +323,66 @@ fun GuardiaTipsScreen(
                         .fillMaxWidth()
                         .fillMaxHeight(0.95f),
                     shape = RoundedCornerShape(32.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
                 ) {
-                    Row(modifier = Modifier.fillMaxSize()) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .background(leftColor)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(bgColor)
+                            .padding(horizontal = 24.dp, vertical = 24.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(24.dp),
-                                verticalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = tip.title,
-                                    fontSize = 22.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF111827),
-                                    lineHeight = 28.sp
-                                )
+                            // título
+                            Text(
+                                text = tip.title,
+                                fontSize = 26.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                lineHeight = 30.sp
+                            )
 
-                                // ==== AQUI ENTRA A IMAGEM ====
-                                Surface(
-                                    shape = RoundedCornerShape(24.dp),
-                                    color = Color(0x33FFFFFF),
+                            Spacer(Modifier.height(8.dp))
+
+                            // 🔥 área da imagem pega TODO o resto, ANCORADA EMBAIXO
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                contentAlignment = Alignment.BottomCenter
+                            ) {
+                                Image(
+                                    painter = painterResource(id = tip.imageRes),
+                                    contentDescription = null,
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(160.dp)
-                                ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.guardia_celular),
-                                            contentDescription = "Guardiã com celular",
-                                            modifier = Modifier
-                                                .fillMaxWidth(0.9f)
-                                                .height(160.dp)
-                                        )
-                                    }
-                                }
+                                        .fillMaxWidth(1.3f)
+                                        .graphicsLayer {
+                                            transformOrigin = TransformOrigin(0.5f, 1f)
+                                            scaleX = 2.55f
+                                            scaleY = 2.55f
+                                        }
+                                        .offset(
+                                            x = if (tip.id == 2) 20.dp else 0.dp,  // ajuste card 2
+                                            y = 30.dp
+                                        ),
+                                    contentScale = ContentScale.Fit
+                                )
                             }
                         }
-
-                        Box(
-                            modifier = Modifier
-                                .width(72.dp)
-                                .fillMaxHeight()
-                                .background(rightColor)
-                        )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // ===== Indicadores =====
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 4.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 repeat(tips.size) { index ->
@@ -287,68 +393,96 @@ fun GuardiaTipsScreen(
                             .size(if (selected) 10.dp else 6.dp)
                             .shadow(if (selected) 2.dp else 0.dp, CircleShape)
                             .background(
-                                color = if (selected) Color(0xFF2563A7) else Color(0xFFCBD5F5),
+                                color = if (selected) Color.White else Color(0x80FFFFFF),
                                 shape = CircleShape
                             )
                     )
                 }
             }
 
-            // ===== FAQ =====
+            // ===== Card FAQ (agora com imagem à esquerda) =====
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
                     .clickable { showFaqDialog = true },
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE5ECFF)),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF9EC5FF)), // azul do protótipo
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
+
+
+                    Image(
+                        painter = painterResource(id = R.drawable.guardia_chat),
+                        contentDescription = "Ilustração Guardiã FAQ",
+                        modifier = Modifier
+                            .size(90.dp)
+                            .scale(2.7f)
+                            .offset(x = (-6).dp, y = 4.dp),  // 🔥 DESCE 10dp
+                        contentScale = ContentScale.Fit
+                    )
+
+                    Spacer(Modifier.width(6.dp))
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+
                         Text(
                             text = "Dúvidas sobre a Guardiã?",
-                            fontSize = 14.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1F2933)
+                            color = Color(0xFF0E3B5E) // título escuro
                         )
+
                         Text(
-                            text = "Perguntas frequentes",
+                            text = "Respondemos nas",
                             fontSize = 12.sp,
-                            color = Color(0xFF4B5563)
+                            color = Color(0xFF2F4A65)
                         )
+
+                        Spacer(Modifier.height(6.dp))
+
+                        // ⭐ BOTÃO IGUAL AO PROTÓTIPO
+                        OutlinedButton(
+                            onClick = { showFaqDialog = true },
+                            shape = RoundedCornerShape(50),
+                            border = BorderStroke(2.dp, Color.White),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color.Transparent,
+                                contentColor = Color.White
+                            ),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)
+                        ) {
+                            Text(
+                                text = "Perguntas frequentes",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "Abrir FAQ",
-                        tint = Color(0xFF2563A7)
-                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // ===== Bottom Nav =====
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(imageVector = Icons.Default.Home, contentDescription = "Início", tint = Color(0xFF9CA3AF))
-                Icon(imageVector = Icons.Default.Lightbulb, contentDescription = "Dicas", tint = Color(0xFF2563A7))
-                Icon(imageVector = Icons.Default.ChatBubble, contentDescription = "Chat", tint = Color(0xFF9CA3AF))
-                Icon(imageVector = Icons.Default.Person, contentDescription = "Perfil", tint = Color(0xFF9CA3AF))
-            }
 
             Spacer(modifier = Modifier.height(8.dp))
+
+            // ===== Bottom Bar (igual Home) =====
+            GuardiaBottomBar(
+                currentRoute = "tips",
+                onItemClick = { route ->
+                    when (route) {
+                        "home" -> onBackClick()
+                        else -> { /* aqui você conecta com o NavController depois */ }
+                    }
+                }
+            )
         }
 
         if (showFaqDialog) {
@@ -357,6 +491,7 @@ fun GuardiaTipsScreen(
     }
 }
 
+// ---------- Diálogo ----------
 @Composable
 fun TipDialog(
     tip: TipItem,
@@ -430,7 +565,11 @@ fun TipDialog(
     }
 }
 
-@Preview(name = "Tela de Dicas - Carrossel", showBackground = true, showSystemUi = true)
+@Preview(
+    name = "Tela de Dicas - Carrossel",
+    showBackground = true,
+    showSystemUi = true
+)
 @Composable
 fun GuardiaTipsScreenPreview() {
     GuardiaTipsScreen()
