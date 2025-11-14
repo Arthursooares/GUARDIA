@@ -424,7 +424,7 @@ fun GuardiaTipsScreen(
                         modifier = Modifier
                             .size(90.dp)
                             .scale(2.7f)
-                            .offset(x = (-6).dp, y = 3.dp),  // 🔥 DESCE 10dp
+                            .offset(x = (-6).dp, y = 4.dp),  // 🔥 DESCE 10dp
                         contentScale = ContentScale.Fit
                     )
 
