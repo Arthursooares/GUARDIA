@@ -172,6 +172,114 @@ private fun ShortcutCard(
 
 data class HomeCardData(val title: String, val icon: ImageVector)
 
+
+// ---------- Bottom Bar melhorada ----------
+data class BottomNavItem(
+    val route: String,
+    val label: String,
+    val icon: ImageVector,
+    val isCenter: Boolean = false
+)
+
+@Composable
+private fun GuardiaBottomBar(
+    currentRoute: String,
+    onItemClick: (String) -> Unit
+) {
+    val items = listOf(
+        BottomNavItem("feed", "Feed", Icons.Filled.ChatBubble),
+        BottomNavItem("itens", "Itens", Icons.Filled.Description),
+        BottomNavItem("home", "Início", Icons.Filled.Home, isCenter = true),
+        BottomNavItem("guardia", "Guardiã", Icons.Filled.Star),
+        BottomNavItem("perfil", "Perfil", Icons.Filled.Person)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // "Pílula" de fundo da bottom bar (glass / card moderno)
+        Surface(
+            shape = RoundedCornerShape(26.dp),
+            color = Color.White.copy(alpha = 0.96f),
+            shadowElevation = 14.dp,
+            tonalElevation = 0.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(62.dp)
+        ) {
+            NavigationBar(
+                containerColor = Color.Transparent,
+                tonalElevation = 0.dp
+            ) {
+                items.forEach { item ->
+                    val selected = currentRoute == item.route
+
+                    NavigationBarItem(
+                        selected = selected,
+                        onClick = { onItemClick(item.route) },
+                        icon = {
+                            if (item.isCenter) {
+                                // Botão central flutuante
+                                // Botão central flutuante — AGORA MAIS BAIXO
+                                Box(
+                                    modifier = Modifier
+                                        .offset(y = (5).dp)   // ⬅️ antes era -18.dp
+                                        .size(64.dp)
+                                        .shadow(
+                                            elevation = 16.dp,
+                                            shape = CircleShape,
+                                            clip = false
+                                        )
+                                        .clip(CircleShape)
+                                        .background(
+                                            Brush.verticalGradient(
+                                                listOf(PrimaryTeal, PrimaryBlue)
+                                            )
+                                        )
+                                        .border(1.dp, Color.White.copy(alpha = 0.7f), CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = item.label,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                }
+
+                            } else {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = item.label,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                        },
+                        label = {
+                            Text(
+                                text = item.label,
+                                fontSize = 10.sp
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = PrimaryBlue,
+                            selectedTextColor = PrimaryBlue,
+                            indicatorColor = Color(0xFFE6F0FB),
+                            unselectedIconColor = Color(0xFF9AA9B5),
+                            unselectedTextColor = Color(0xFF9AA9B5)
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+
 // ---------- TELA ----------
 @Composable
 fun HomeScreen(
@@ -340,50 +448,17 @@ fun HomeScreen(
                 Spacer(Modifier.height(16.dp))
             }
 
-            // Bottom Bar
-            NavigationBar(containerColor = Color.White, tonalElevation = 10.dp) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* esquerdo 1 */ },
-                    icon = { Icon(Icons.Filled.ChatBubble, contentDescription = "Mensagens", tint = Color(0xFF9AA9B5)) },
-                    label = { Text("Feed", fontSize = 10.sp) }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* esquerdo 2 */ },
-                    icon = { Icon(Icons.Filled.Description, contentDescription = "Itens", tint = Color(0xFF9AA9B5)) },
-                    label = { Text("Itens", fontSize = 10.sp) }
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { /* Home */ },
-                    icon = {
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(Brush.verticalGradient(listOf(AzureMid, AzureLight)))
-                                .border(1.dp, CardStroke, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Filled.Home, contentDescription = "Início", tint = TitleDark)
-                        }
-                    },
-                    label = { Text("Início", fontSize = 10.sp) }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { onItemClick("guardia") },
-                    icon = { Icon(Icons.Filled.Star, contentDescription = "Guardiã", tint = Color(0xFF9AA9B5)) },
-                    label = { Text("Guardiã", fontSize = 10.sp) }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { /* Perfil */ },
-                    icon = { Icon(Icons.Filled.Person, contentDescription = "Perfil", tint = Color(0xFF9AA9B5)) },
-                    label = { Text("Perfil", fontSize = 10.sp) }
-                )
-            }
+            // Bottom Bar melhorada
+            GuardiaBottomBar(
+                currentRoute = "home", // por enquanto fixo, depois você pode passar a rota real
+                onItemClick = { route ->
+                    when (route) {
+                        "guardia" -> onItemClick("guardia")
+                        // aqui depois você pode usar navController.navigate(route)
+                        else -> { /* TODO navegação para outras rotas */ }
+                    }
+                }
+            )
         }
     }
 }
