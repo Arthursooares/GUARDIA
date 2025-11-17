@@ -77,5 +77,15 @@ fun AppNavGraph(navController: NavHostController) {
             GuardiaTipsScreen(navController = navController)
         }
 
+        composable("upgrade") {
+            UpgradeScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable("config") {
+            SettingsScreen(navController = navController)
+        }
+
     }
 }

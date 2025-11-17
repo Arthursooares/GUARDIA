@@ -7,16 +7,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChatBubble
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,6 +33,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.guardia.R
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 // ---------- Paleta ----------
 private val AzureLight = Color(0xFFE8F5FF)
@@ -178,7 +178,15 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(AzureLight, AzureMid, AzureLight)))
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFB2EBF2),
+                        Color(0xFFE0F7FA),
+                        Color(0xFF8EC7E3)
+                    )
+                )
+            )
     ) {
         Column(Modifier.fillMaxSize()) {
 
@@ -190,9 +198,11 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = onMenuClick) {
-                    Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = TitleDark)
-                }
+                PerfilMenuButton(
+                    onPerfilClick = { navController.navigate("perfil") },
+                    onConfigClick = { navController.navigate("config") }
+                )
+
             }
 
             // Conteúdo (scroll)
@@ -279,9 +289,18 @@ fun HomeScreen(
                                 contentDescription = "Personagem Guardiã",
                                 modifier = Modifier
                                     .fillMaxHeight()
-                                    .aspectRatio(0.6f),
+                                    .aspectRatio(0.6f)
+                                    .graphicsLayer {
+                                        scaleX = 1.8f
+                                        scaleY = 1.8f
+                                        translationY = (-26).dp.toPx()   // sobe a imagem
+                                        translationX = (-12).dp.toPx()   // move para a esquerda
+                                        transformOrigin = TransformOrigin.Center
+                                    },
                                 contentScale = ContentScale.Fit
                             )
+
+
                         }
                     }
                 }
@@ -314,12 +333,15 @@ fun HomeScreen(
                 ImageCard(
                     title = "Upgrade Guardiã",
                     imageRes = R.drawable.estrela,
-                    onClick = { onItemClick("Upgrade Guardiã") },
+                    onClick = {
+                        navController.navigate("upgrade")
+                    },
                     imageSize = 74.dp,
                     imageScale = 1.6f,
                     imageOffsetX = (-3).dp,
                     imageOffsetY = (-1).dp
                 )
+
                 Spacer(Modifier.height(14.dp))
 
                 ImageCard(
@@ -342,7 +364,7 @@ fun HomeScreen(
                     when (route) {
                         "home"   -> navController.navigate("home")
                         "perfil" -> navController.navigate("perfil")
-                        "chat"   -> navController.navigate("guardia")
+
                         "grupo"  -> navController.navigate("grupo")
                         "config" -> navController.navigate("config")
                     }
@@ -357,4 +379,41 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     val navController = androidx.navigation.compose.rememberNavController()
     HomeScreen(navController = navController)
+}
+@Composable
+fun PerfilMenuButton(
+    onPerfilClick: () -> Unit,
+    onConfigClick: () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = Icons.Filled.Menu,
+                contentDescription = "Menu",
+                tint = TitleDark
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Perfil") },
+                onClick = {
+                    expanded = false
+                    onPerfilClick()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Configurações") },
+                onClick = {
+                    expanded = false
+                    onConfigClick()
+                }
+            )
+        }
+    }
 }

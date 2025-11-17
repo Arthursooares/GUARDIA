@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -50,7 +51,13 @@ data class TipItem(
     val id: Int,
     val title: String,
     val content: String,
-    @DrawableRes val imageRes: Int
+    @DrawableRes val imageRes: Int,
+
+    // ===== CONTROLES DA IMAGEM (por card) =====
+    val imageScale: Float = 1f,
+    val imageOffsetX: Dp = 0.dp,
+    val imageOffsetY: Dp = 0.dp,
+    val imageWidthFraction: Float = 1f
 )
 
 // ---------- Tela de Dicas ----------
@@ -68,7 +75,11 @@ fun GuardiaTipsScreen(
                     "• Use apelidos, não seu nome real\n\n" +
                     "• Não compartilhe dados pessoais com outros jogadores\n\n" +
                     "• Bloqueie e reporte comportamentos abusivos",
-            imageRes = R.drawable.guardia_videogame
+            imageRes = R.drawable.guardia_videogame,
+            imageScale = 2.55f,
+            imageOffsetX = 5.dp,
+            imageOffsetY = 33.dp,
+            imageWidthFraction = 1.3f
         ),
         TipItem(
             id = 2,
@@ -77,7 +88,11 @@ fun GuardiaTipsScreen(
                     "• Compartilhe o que você faz na internet\n\n" +
                     "• Peça ajuda quando se sentir desconfortável\n\n" +
                     "• Mantenha um diálogo saudável e honesto",
-            imageRes = R.drawable.guardia_familia
+            imageRes = R.drawable.guardia_familia,
+            imageScale = 2.55f,
+            imageOffsetX = 20.dp,      // ➜ mais pra direita
+            imageOffsetY = 30.dp,
+            imageWidthFraction = 1.3f
         ),
         TipItem(
             id = 3,
@@ -86,7 +101,11 @@ fun GuardiaTipsScreen(
                     "• Configure suas redes sociais como privadas\n\n" +
                     "• Cuidado ao aceitar solicitações de amizade de desconhecidos\n\n" +
                     "• Pense bem antes de postar fotos ou informações",
-            imageRes = R.drawable.guardia_celular
+            imageRes = R.drawable.guardia_celular,
+            imageScale = 2.55f,
+            imageOffsetX = 5.dp,
+            imageOffsetY = 33.dp,
+            imageWidthFraction = 1.3f
         ),
         TipItem(
             id = 4,
@@ -98,10 +117,15 @@ fun GuardiaTipsScreen(
                     "• Presentes inesperados\n" +
                     "• Conversas com conteúdo sexual\n" +
                     "• Pedidos de fotos íntimas",
-            imageRes = R.drawable.guardia_escudo
+            imageRes = R.drawable.guardia_escudo,
+            imageScale = 2.55f,
+            imageOffsetX = 10.dp,
+            imageOffsetY = 34.dp,
+            imageWidthFraction = 1.3f
         )
     )
 
+    // Tip especial do FAQ (usa os defaults de imagem)
     val faqTip = TipItem(
         id = 5,
         title = "Perguntas Frequentes",
@@ -129,9 +153,14 @@ fun GuardiaTipsScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF9FE2EE), Color(0xFF7DD4E5))
+                    listOf(
+                        Color(0xFFB2EBF2),
+                        Color(0xFFE0F7FA),
+                        Color(0xFF8EC7E3)
+                    )
                 )
             )
+
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // ===== Header =====
@@ -249,15 +278,15 @@ fun GuardiaTipsScreen(
                                     painter = painterResource(id = tip.imageRes),
                                     contentDescription = null,
                                     modifier = Modifier
-                                        .fillMaxWidth(1.3f)
+                                        .fillMaxWidth(tip.imageWidthFraction)
                                         .graphicsLayer {
                                             transformOrigin = TransformOrigin(0.5f, 1f)
-                                            scaleX = 2.55f
-                                            scaleY = 2.55f
+                                            scaleX = tip.imageScale
+                                            scaleY = tip.imageScale
                                         }
                                         .offset(
-                                            x = if (tip.id == 2) 20.dp else 0.dp,
-                                            y = 30.dp
+                                            x = tip.imageOffsetX,
+                                            y = tip.imageOffsetY
                                         ),
                                     contentScale = ContentScale.Fit
                                 )
