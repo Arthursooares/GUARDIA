@@ -76,7 +76,6 @@ fun EditScreen() {
             Box(
                 modifier = Modifier
                     .size(170.dp)
-
                     .padding(4.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -86,7 +85,8 @@ fun EditScreen() {
                         contentDescription = "Foto de Perfil",
                         modifier = Modifier
                             .size(150.dp)
-                            .clip(CircleShape),
+                            .clip(CircleShape)
+                            .border(4.dp, Color.White, CircleShape), // AQUI: Adicionamos a borda
                         contentScale = ContentScale.Crop
                     )
                     IconButton(
@@ -108,21 +108,21 @@ fun EditScreen() {
 
             // --- Campos de Texto ---
             Column(modifier = Modifier.fillMaxWidth()) {
-                UnderlinedTextField(label = "Nome", value = nome, onValueChange = { nome = it })
-                Spacer(modifier = Modifier.height(60.dp))
-                UnderlinedTextField(label = "Sobrenome", value = sobrenome, onValueChange = { sobrenome = it })
-                Spacer(modifier = Modifier.height(60.dp))
-                UnderlinedTextField(
+                StyledEditTextField(label = "Nome", value = nome, onValueChange = { nome = it })
+                Spacer(modifier = Modifier.height(24.dp))
+                StyledEditTextField(label = "Sobrenome", value = sobrenome, onValueChange = { sobrenome = it })
+                Spacer(modifier = Modifier.height(24.dp))
+                StyledEditTextField(
                     label = "Estado",
                     value = estado,
                     onValueChange = { estado = it },
                     trailingIcon = {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown")
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown", tint = Color(0xFF1E40AF))
                     }
                 )
             }
 
-            Spacer(modifier = Modifier.height(200.dp))
+            Spacer(modifier = Modifier.height(220.dp))
 
             // --- Botão Atualizar ---
             Button(
@@ -130,22 +130,22 @@ fun EditScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(30),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF1E40AF)
                 )
             ) {
-                Text(text = "Atualizar", fontSize = 18.sp)
+                Text(text = "Atualizar", fontSize = 18.sp, color = Color.White)
             }
         }
     }
 }
 
 /**
- * Componente reutilizável para um campo de texto com label e linha embaixo.
+ * Componente reutilizável para um campo de texto com fundo e cantos arredondados.
  */
 @Composable
-fun UnderlinedTextField(
+fun StyledEditTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
@@ -156,28 +156,36 @@ fun UnderlinedTextField(
             text = label,
             color = Color(0xFF1E40AF),
             fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp
+            fontSize = 16.sp,
+            modifier = Modifier.padding(start = 8.dp)
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Spacer(modifier = Modifier.height(4.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White.copy(alpha = 0.7f), shape = CircleShape)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            contentAlignment = Alignment.CenterStart
         ) {
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = Modifier.weight(1f),
-                textStyle = TextStyle(
-                    color = Color.White,
-                    fontSize = 18.sp
-                ),
-                cursorBrush = SolidColor(Color.White),
-                singleLine = true
-            )
-            if (trailingIcon != null) {
-                trailingIcon()
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    modifier = Modifier.weight(1f),
+                    textStyle = TextStyle(
+                        color = Color(0xFF1E40AF),
+                        fontSize = 18.sp
+                    ),
+                    cursorBrush = SolidColor(Color(0xFF1E40AF)),
+                    singleLine = true
+                )
+                if (trailingIcon != null) {
+                    trailingIcon()
+                }
             }
         }
-        Divider(color = Color(0xFF3B82F6), thickness = 1.dp)
     }
 }
 
