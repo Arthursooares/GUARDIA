@@ -21,7 +21,6 @@ fun AppNavGraph(navController: NavHostController) {
             )
         }
 
-
         // 🟡 Login
         composable("login") {
             LoginScreen(
@@ -39,26 +38,44 @@ fun AppNavGraph(navController: NavHostController) {
         // 🔵 Home
         composable("home") {
             HomeScreen(
-                navController = navController, // ✅ passa o NavController aqui!
+                navController = navController,
                 onItemClick = { route ->
-                    navController.navigate(route)
+                    when (route) {
+                        // ÍCONE DE CHAT DA BOTTOM BAR
+                        "chat" -> navController.navigate("guardia")
+
+                        // Botão flutuante ou outros que mandem "home"
+                        "home" -> navController.navigate("home") {
+                            launchSingleTop = true
+                        }
+
+                        // Se no futuro você tiver outras rotas com mesmo nome:
+                        "perfil" -> navController.navigate("perfil")
+                        "grupo"  -> navController.navigate("grupo")
+                        "config" -> navController.navigate("config")
+
+                        // fallback genérico (se quiser manter)
+                        else -> {
+                            // navController.navigate(route)
+                        }
+                    }
                 },
                 onChatClick = {
+                    // Botão grande "Converse com a Guardiã"
                     navController.navigate("guardia")
                 }
             )
         }
 
-        // 🟣 Guardia
+        // 🟣 Guardia (tela de chat)
         composable("guardia") {
             GuardiaScreen()
         }
 
+        // 🔹 Tela de Dicas
         composable("tips") {
-            GuardiaTipsScreen(onBackClick = { navController.popBackStack() })
+            GuardiaTipsScreen(navController = navController)
         }
 
-
     }
-
 }
