@@ -3,25 +3,15 @@ package com.example.guardia.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +28,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,7 +37,14 @@ import androidx.compose.ui.unit.sp
 import com.example.guardia.R
 import com.example.guardia.ui.theme.GuardiaTheme
 
-// AQUI: Corrigimos a assinatura da função para aceitar os dois parâmetros
+// Paleta puxando pro estilo do app
+private val AzureLight = Color(0xFFE8F5FF)
+private val AzureMid   = Color(0xFFD3ECFF)
+private val TitleDark  = Color(0xFF0E3B5E)
+private val PrimaryTeal = Color(0xFF33B2B2)
+private val PrimaryBlue = Color(0xFF0E6D90)
+
+// AQUI: Login moderno com cara de Guardiã
 @Composable
 fun LoginScreen(
     onRegisterClick: () -> Unit,
@@ -54,158 +52,233 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val tituloTexto = "Login"
+    var passwordVisible by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.bg_splash),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFB2EBF2),
+                        Color(0xFFE0F7FA),
+                        Color(0xFF8EC7E3)
+                    )
+                )
+            )
 
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 24.dp, vertical = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
+
+            // Logo / Escudo
             Image(
                 painter = painterResource(id = R.drawable.shield),
-                contentDescription = "Logo Guardião",
-                modifier = Modifier.size(240.dp),
-                contentScale = ContentScale.Crop
+                contentDescription = "Logo Guardiã",
+                modifier = Modifier
+                    .size(150.dp)
+                    .padding(top = 8.dp, bottom = 4.dp),
+                contentScale = ContentScale.Fit
             )
 
             Text(
-                text = tituloTexto,
-                fontSize = 34.sp,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 32.dp)
+                text = "Bem-vindo(a) de volta",
+                fontSize = 22.sp,
+                color = TitleDark,
+                fontWeight = FontWeight.Bold
             )
 
-            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-                Text(
-                    text = "Email",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
-                )
+            Text(
+                text = "Segurança na tela proteção para a vida",
+                fontSize = 13.sp,
+                color = TitleDark.copy(alpha = 0.8f),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 4.dp, bottom = 20.dp)
+            )
 
-                TextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("email@gmail.com") },
-                    shape = RoundedCornerShape(16.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.primary,
-                        unfocusedTextColor = MaterialTheme.colorScheme.primary,
-                        cursorColor = Color.Black,
-                        focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    singleLine = true
-                )
-                Spacer(modifier = Modifier.padding(8.dp))
-
-                Text(
-                    text = "Senha",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
-                )
-
-                TextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("********") },
-                    shape = RoundedCornerShape(16.dp),
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.primary,
-                        unfocusedTextColor = MaterialTheme.colorScheme.primary,
-                        cursorColor = Color.Black,
-                        focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    singleLine = true
-                )
-                Spacer(modifier = Modifier.padding(5.dp))
-                Button(
-                    onClick = { onLoginClick(email, password) },
+            // Card branco com os campos
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.96f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    contentPadding = PaddingValues(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
-                    )
+                        .padding(horizontal = 18.dp, vertical = 22.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Box(
+
+                    // Título card
+                    Text(
+                        text = "Login",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TitleDark,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    // EMAIL
+                    Text(
+                        text = "E-mail",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TitleDark,
+                        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                    )
+
+                    TextField(
+                        value = email,
+                        onValueChange = { email = it },
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(
-                                        Color(0xFF1E3A8A),
-                                        Color(0xFF080F2F)
-                                    )
-                                )
-                            )
-                            .padding(vertical = 16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Entrar",
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontSize = 22.sp
+                            .fillMaxWidth(),
+                        placeholder = { Text("seuemail@gmail.com") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = TitleDark,
+                            unfocusedTextColor = TitleDark,
+                            cursorColor = PrimaryBlue,
+                            focusedContainerColor = Color(0xFFF4F7FB),
+                            unfocusedContainerColor = Color(0xFFF4F7FB),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
                         )
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // SENHA
+                    Text(
+                        text = "Senha",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TitleDark,
+                        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                    )
+
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        placeholder = { Text("Digite sua senha") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
+                        visualTransformation = if (passwordVisible)
+                            VisualTransformation.None
+                        else
+                            PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(
+                                    imageVector = if (passwordVisible)
+                                        Icons.Filled.VisibilityOff
+                                    else
+                                        Icons.Filled.Visibility,
+                                    contentDescription = if (passwordVisible) "Ocultar senha" else "Mostrar senha",
+                                    tint = PrimaryBlue.copy(alpha = 0.9f)
+                                )
+                            }
+                        },
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = TitleDark,
+                            unfocusedTextColor = TitleDark,
+                            cursorColor = PrimaryBlue,
+                            focusedContainerColor = Color(0xFFF4F7FB),
+                            unfocusedContainerColor = Color(0xFFF4F7FB),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        )
+                    )
+
+                    // Esqueci a senha (clicável no futuro)
+                    Text(
+                        text = "Esqueci minha senha",
+                        fontSize = 12.sp,
+                        color = PrimaryBlue,
+                        modifier = Modifier
+                            .padding(top = 8.dp, end = 4.dp)
+                            .align(Alignment.End)
+                            .clickable {
+                                // TODO: fluxo de recuperação de senha
+                            }
+                    )
+
+                    Spacer(modifier = Modifier.height(18.dp))
+
+                    // Botão Entrar
+                    Button(
+                        onClick = { onLoginClick(email, password) },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(24.dp),
+                        contentPadding = PaddingValues(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    brush = Brush.horizontalGradient(
+                                        colors = listOf(PrimaryTeal, PrimaryBlue)
+                                    ),
+                                    shape = RoundedCornerShape(24.dp)
+                                )
+                                .padding(vertical = 14.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Entrar",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
                 }
-                Spacer(modifier = Modifier.padding(16.dp))
-
-                Text(
-                    fontSize = 14.sp,
-                    text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onPrimary)) {
-                            append("Não tem uma conta? ")
-                        }
-                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.tertiary)) {
-                            append("Cadastre-se")
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { /**/ },
-                    textAlign = TextAlign.Center
-                )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // "Não tem conta? Cadastre-se"
+            Text(
+                fontSize = 14.sp,
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = TitleDark)) {
+                        append("Não tem uma conta? ")
+                    }
+                    withStyle(style = SpanStyle(color = PrimaryBlue, fontWeight = FontWeight.SemiBold)) {
+                        append("Cadastre-se")
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onRegisterClick() },
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LoginScreenPreview() {
-    GuardiaTheme() {
+    GuardiaTheme {
         LoginScreen(onRegisterClick = {})
     }
 }

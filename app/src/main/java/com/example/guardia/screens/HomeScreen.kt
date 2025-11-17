@@ -7,16 +7,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChatBubble
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,7 +33,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.guardia.R
 import androidx.compose.ui.draw.scale
-
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 // ---------- Paleta ----------
 private val AzureLight = Color(0xFFE8F5FF)
@@ -47,17 +46,17 @@ private val AzureMid   = Color(0xFFD3ECFF)
 private val TitleDark  = Color(0xFF0E3B5E)
 private val PrimaryTeal = Color(0xFF33B2B2)
 private val PrimaryBlue = Color(0xFF0E6D90)
-private val IconBg     = Color(0xFFE7F1FA) // reservado caso queira usar
+private val IconBg     = Color(0xFFE7F1FA)
 private val CardStroke = Color(0xFFE1ECF7)
 
-// ---------- Card com IMAGEM (com tamanho/padding/offset individual) ----------
+// ---------- Card com IMAGEM ----------
 @Composable
 private fun ImageCard(
     title: String,
     @DrawableRes imageRes: Int,
     onClick: () -> Unit,
-    imageSize: Dp = 70.dp,          // tamanho do espaço reservado
-    imageScale: Float = 1.0f,       // 🔹 aumenta a imagem dentro do espaço
+    imageSize: Dp = 70.dp,
+    imageScale: Float = 1.0f,
     imagePadding: Dp = 0.dp,
     imageOffsetY: Dp = 0.dp,
     imageOffsetX: Dp = 0.dp,
@@ -73,11 +72,10 @@ private fun ImageCard(
             .border(1.dp, CardStroke, RoundedCornerShape(20.dp))
             .clickable { onClick() }
     ) {
-        // 🔹 imagem à esquerda, cresce dentro do espaço com scale()
         Box(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .offset(x = imageOffsetX, y = imageOffsetY) // 🔹 agora age antes do padding
+                .offset(x = imageOffsetX, y = imageOffsetY)
                 .padding(start = 16.dp)
                 .size(imageSize),
             contentAlignment = Alignment.Center
@@ -92,7 +90,6 @@ private fun ImageCard(
             )
         }
 
-        // 🔹 texto à direita
         Text(
             text = title,
             fontSize = 18.sp,
@@ -104,7 +101,6 @@ private fun ImageCard(
         )
     }
 }
-
 
 // Wrapper para o card de Dicas
 @Composable
@@ -131,9 +127,7 @@ private fun TipsCard(
     )
 }
 
-
-
-// ---------- Card com ÍCONE (mantido caso queira usar em outros lugares) ----------
+// ---------- Card com ÍCONE (mantido caso queira usar depois) ----------
 @Composable
 private fun ShortcutCard(
     title: String,
@@ -172,114 +166,6 @@ private fun ShortcutCard(
 
 data class HomeCardData(val title: String, val icon: ImageVector)
 
-
-// ---------- Bottom Bar melhorada ----------
-data class BottomNavItem(
-    val route: String,
-    val label: String,
-    val icon: ImageVector,
-    val isCenter: Boolean = false
-)
-
-@Composable
-private fun GuardiaBottomBar(
-    currentRoute: String,
-    onItemClick: (String) -> Unit
-) {
-    val items = listOf(
-        BottomNavItem("feed", "Feed", Icons.Filled.ChatBubble),
-        BottomNavItem("itens", "Itens", Icons.Filled.Description),
-        BottomNavItem("home", "Início", Icons.Filled.Home, isCenter = true),
-        BottomNavItem("guardia", "Guardiã", Icons.Filled.Star),
-        BottomNavItem("perfil", "Perfil", Icons.Filled.Person)
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        // "Pílula" de fundo da bottom bar (glass / card moderno)
-        Surface(
-            shape = RoundedCornerShape(26.dp),
-            color = Color.White.copy(alpha = 0.96f),
-            shadowElevation = 14.dp,
-            tonalElevation = 0.dp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(62.dp)
-        ) {
-            NavigationBar(
-                containerColor = Color.Transparent,
-                tonalElevation = 0.dp
-            ) {
-                items.forEach { item ->
-                    val selected = currentRoute == item.route
-
-                    NavigationBarItem(
-                        selected = selected,
-                        onClick = { onItemClick(item.route) },
-                        icon = {
-                            if (item.isCenter) {
-                                // Botão central flutuante
-                                // Botão central flutuante — AGORA MAIS BAIXO
-                                Box(
-                                    modifier = Modifier
-                                        .offset(y = (5).dp)   // ⬅️ antes era -18.dp
-                                        .size(64.dp)
-                                        .shadow(
-                                            elevation = 16.dp,
-                                            shape = CircleShape,
-                                            clip = false
-                                        )
-                                        .clip(CircleShape)
-                                        .background(
-                                            Brush.verticalGradient(
-                                                listOf(PrimaryTeal, PrimaryBlue)
-                                            )
-                                        )
-                                        .border(1.dp, Color.White.copy(alpha = 0.7f), CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = item.icon,
-                                        contentDescription = item.label,
-                                        tint = Color.White,
-                                        modifier = Modifier.size(28.dp)
-                                    )
-                                }
-
-                            } else {
-                                Icon(
-                                    imageVector = item.icon,
-                                    contentDescription = item.label,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                        },
-                        label = {
-                            Text(
-                                text = item.label,
-                                fontSize = 10.sp
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = PrimaryBlue,
-                            selectedTextColor = PrimaryBlue,
-                            indicatorColor = Color(0xFFE6F0FB),
-                            unselectedIconColor = Color(0xFF9AA9B5),
-                            unselectedTextColor = Color(0xFF9AA9B5)
-                        )
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-
 // ---------- TELA ----------
 @Composable
 fun HomeScreen(
@@ -292,7 +178,15 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(AzureLight, AzureMid, AzureLight)))
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFB2EBF2),
+                        Color(0xFFE0F7FA),
+                        Color(0xFF8EC7E3)
+                    )
+                )
+            )
     ) {
         Column(Modifier.fillMaxSize()) {
 
@@ -304,9 +198,11 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = onMenuClick) {
-                    Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = TitleDark)
-                }
+                PerfilMenuButton(
+                    onPerfilClick = { navController.navigate("perfil") },
+                    onConfigClick = { navController.navigate("config") }
+                )
+
             }
 
             // Conteúdo (scroll)
@@ -393,20 +289,29 @@ fun HomeScreen(
                                 contentDescription = "Personagem Guardiã",
                                 modifier = Modifier
                                     .fillMaxHeight()
-                                    .aspectRatio(0.6f),
+                                    .aspectRatio(0.6f)
+                                    .graphicsLayer {
+                                        scaleX = 1.8f
+                                        scaleY = 1.8f
+                                        translationY = (-26).dp.toPx()   // sobe a imagem
+                                        translationX = (-12).dp.toPx()   // move para a esquerda
+                                        transformOrigin = TransformOrigin.Center
+                                    },
                                 contentScale = ContentScale.Fit
                             )
+
+
                         }
                     }
                 }
 
                 Spacer(Modifier.height(20.dp))
 
-                // ----- Card "Dicas da Guardiã" -> navega para a tela de dicas -----
+                // Card "Dicas da Guardiã" -> navega para a tela de dicas
                 TipsCard(
                     imageRes = R.drawable.ic_dicas,
                     onClick = {
-                        navController.navigate("tips")   // 👈 AQUI faz a navegação
+                        navController.navigate("tips")
                     },
                     imageSize = 72.dp,
                     imageScale = 1.3f,
@@ -428,12 +333,15 @@ fun HomeScreen(
                 ImageCard(
                     title = "Upgrade Guardiã",
                     imageRes = R.drawable.estrela,
-                    onClick = { onItemClick("Upgrade Guardiã") },
+                    onClick = {
+                        navController.navigate("upgrade")
+                    },
                     imageSize = 74.dp,
                     imageScale = 1.6f,
                     imageOffsetX = (-3).dp,
                     imageOffsetY = (-1).dp
                 )
+
                 Spacer(Modifier.height(14.dp))
 
                 ImageCard(
@@ -448,14 +356,17 @@ fun HomeScreen(
                 Spacer(Modifier.height(16.dp))
             }
 
-            // Bottom Bar melhorada
+            // ✅ Bottom bar compartilhada
             GuardiaBottomBar(
-                currentRoute = "home", // por enquanto fixo, depois você pode passar a rota real
+                currentRoute = "home",
                 onItemClick = { route ->
+                    // Aqui você decide o que cada item faz
                     when (route) {
-                        "guardia" -> onItemClick("guardia")
-                        // aqui depois você pode usar navController.navigate(route)
-                        else -> { /* TODO navegação para outras rotas */ }
+                        "home"   -> navController.navigate("home")
+                        "perfil" -> navController.navigate("perfil")
+
+                        "grupo"  -> navController.navigate("grupo")
+                        "config" -> navController.navigate("config")
                     }
                 }
             )
@@ -463,10 +374,46 @@ fun HomeScreen(
     }
 }
 
-
 @Preview(showBackground = true, backgroundColor = 0xFFE8F5FF)
 @Composable
 fun HomeScreenPreview() {
     val navController = androidx.navigation.compose.rememberNavController()
     HomeScreen(navController = navController)
+}
+@Composable
+fun PerfilMenuButton(
+    onPerfilClick: () -> Unit,
+    onConfigClick: () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = Icons.Filled.Menu,
+                contentDescription = "Menu",
+                tint = TitleDark
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Perfil") },
+                onClick = {
+                    expanded = false
+                    onPerfilClick()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Configurações") },
+                onClick = {
+                    expanded = false
+                    onConfigClick()
+                }
+            )
+        }
+    }
 }

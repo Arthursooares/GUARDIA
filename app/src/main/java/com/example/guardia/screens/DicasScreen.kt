@@ -15,12 +15,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -31,12 +30,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.guardia.R
 
-// ---------- Paleta / cores usadas também na bottom bar ----------
+// ---------- Paleta / cores ----------
 private val AzureLight = Color(0xFFE8F5FF)
 private val AzureMid   = Color(0xFFD3ECFF)
 private val TitleDark  = Color(0xFF0E3B5E)
@@ -49,115 +51,22 @@ data class TipItem(
     val id: Int,
     val title: String,
     val content: String,
-    @DrawableRes val imageRes: Int
+    @DrawableRes val imageRes: Int,
+
+    // ===== CONTROLES DA IMAGEM (por card) =====
+    val imageScale: Float = 1f,
+    val imageOffsetX: Dp = 0.dp,
+    val imageOffsetY: Dp = 0.dp,
+    val imageWidthFraction: Float = 1f
 )
-
-@Composable
-private fun GuardiaBottomBar(
-    currentRoute: String,
-    onItemClick: (String) -> Unit
-) {
-    val items = listOf(
-        BottomNavItem("feed", "Feed", Icons.Filled.ChatBubble),
-        BottomNavItem("itens", "Itens", Icons.Filled.Description),
-        BottomNavItem("home", "Início", Icons.Filled.Home, isCenter = true),
-        BottomNavItem("guardia", "Guardiã", Icons.Filled.Star),
-        BottomNavItem("perfil", "Perfil", Icons.Filled.Person)
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        // "Pílula" de fundo da bottom bar (glass / card moderno)
-        Surface(
-            shape = RoundedCornerShape(26.dp),
-            color = Color.White.copy(alpha = 0.96f),
-            shadowElevation = 14.dp,
-            tonalElevation = 0.dp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(62.dp)
-        ) {
-            NavigationBar(
-                containerColor = Color.Transparent,
-                tonalElevation = 0.dp
-            ) {
-                items.forEach { item ->
-                    val selected = currentRoute == item.route
-
-                    NavigationBarItem(
-                        selected = selected,
-                        onClick = { onItemClick(item.route) },
-                        icon = {
-                            if (item.isCenter) {
-                                // Botão central flutuante
-                                // Botão central flutuante — AGORA MAIS BAIXO
-                                Box(
-                                    modifier = Modifier
-                                        .offset(y = (5).dp)   // ⬅️ antes era -18.dp
-                                        .size(64.dp)
-                                        .shadow(
-                                            elevation = 16.dp,
-                                            shape = CircleShape,
-                                            clip = false
-                                        )
-                                        .clip(CircleShape)
-                                        .background(
-                                            Brush.verticalGradient(
-                                                listOf(PrimaryTeal, PrimaryBlue)
-                                            )
-                                        )
-                                        .border(1.dp, Color.White.copy(alpha = 0.7f), CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = item.icon,
-                                        contentDescription = item.label,
-                                        tint = Color.White,
-                                        modifier = Modifier.size(28.dp)
-                                    )
-                                }
-
-                            } else {
-                                Icon(
-                                    imageVector = item.icon,
-                                    contentDescription = item.label,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
-                        },
-                        label = {
-                            Text(
-                                text = item.label,
-                                fontSize = 10.sp
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = PrimaryBlue,
-                            selectedTextColor = PrimaryBlue,
-                            indicatorColor = Color(0xFFE6F0FB),
-                            unselectedIconColor = Color(0xFF9AA9B5),
-                            unselectedTextColor = Color(0xFF9AA9B5)
-                        )
-                    )
-                }
-            }
-        }
-    }
-}
-
-
 
 // ---------- Tela de Dicas ----------
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun GuardiaTipsScreen(
-    onBackClick: () -> Unit = {}
+    navController: NavHostController,
+    onBackClick: () -> Unit = { navController.popBackStack() }
 ) {
-    // 🔹 AGORA SÃO 4 CARDS
     val tips = listOf(
         TipItem(
             id = 1,
@@ -166,7 +75,11 @@ fun GuardiaTipsScreen(
                     "• Use apelidos, não seu nome real\n\n" +
                     "• Não compartilhe dados pessoais com outros jogadores\n\n" +
                     "• Bloqueie e reporte comportamentos abusivos",
-            imageRes = R.drawable.guardia_videogame
+            imageRes = R.drawable.guardia_videogame,
+            imageScale = 2.55f,
+            imageOffsetX = 5.dp,
+            imageOffsetY = 33.dp,
+            imageWidthFraction = 1.3f
         ),
         TipItem(
             id = 2,
@@ -175,7 +88,11 @@ fun GuardiaTipsScreen(
                     "• Compartilhe o que você faz na internet\n\n" +
                     "• Peça ajuda quando se sentir desconfortável\n\n" +
                     "• Mantenha um diálogo saudável e honesto",
-            imageRes = R.drawable.guardia_familia
+            imageRes = R.drawable.guardia_familia,
+            imageScale = 2.55f,
+            imageOffsetX = 20.dp,      // ➜ mais pra direita
+            imageOffsetY = 30.dp,
+            imageWidthFraction = 1.3f
         ),
         TipItem(
             id = 3,
@@ -184,7 +101,11 @@ fun GuardiaTipsScreen(
                     "• Configure suas redes sociais como privadas\n\n" +
                     "• Cuidado ao aceitar solicitações de amizade de desconhecidos\n\n" +
                     "• Pense bem antes de postar fotos ou informações",
-            imageRes = R.drawable.guardia_celular
+            imageRes = R.drawable.guardia_celular,
+            imageScale = 2.55f,
+            imageOffsetX = 5.dp,
+            imageOffsetY = 33.dp,
+            imageWidthFraction = 1.3f
         ),
         TipItem(
             id = 4,
@@ -196,10 +117,15 @@ fun GuardiaTipsScreen(
                     "• Presentes inesperados\n" +
                     "• Conversas com conteúdo sexual\n" +
                     "• Pedidos de fotos íntimas",
-            imageRes = R.drawable.guardia_escudo // pode trocar por outra ilustr. depois
+            imageRes = R.drawable.guardia_escudo,
+            imageScale = 2.55f,
+            imageOffsetX = 10.dp,
+            imageOffsetY = 34.dp,
+            imageWidthFraction = 1.3f
         )
     )
 
+    // Tip especial do FAQ (usa os defaults de imagem)
     val faqTip = TipItem(
         id = 5,
         title = "Perguntas Frequentes",
@@ -209,18 +135,17 @@ fun GuardiaTipsScreen(
                 "• Onde buscar ajuda profissional?\n" +
                 "• Como conversar com meus pais sobre isso?\n\n" +
                 "Entre em contato com a Guardiã para mais informações e suporte!",
-        imageRes = R.drawable.guardia_celular // só pra não quebrar, não é exibida no diálogo
+        imageRes = R.drawable.guardia_celular
     )
 
     var showFaqDialog by remember { mutableStateOf(false) }
     val pagerState = rememberPagerState(initialPage = 0) { tips.size }
 
-    // 🔹 4 cores, uma pra cada card (ordem bate com os 4 tips)
     val pageColors = listOf(
-        Color(0xFF063C80), // jogos
-        Color(0xFFFFD166), // comunicação
-        Color(0xFF00B6C9), // redes
-        Color(0xFF7C3AED)  // grooming
+        Color(0xFF063C80),
+        Color(0xFFFFD166),
+        Color(0xFF00B6C9),
+        Color(0xFF7C3AED)
     )
 
     Box(
@@ -228,9 +153,14 @@ fun GuardiaTipsScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF9FE2EE), Color(0xFF7DD4E5))
+                    listOf(
+                        Color(0xFFB2EBF2),
+                        Color(0xFFE0F7FA),
+                        Color(0xFF8EC7E3)
+                    )
                 )
             )
+
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // ===== Header =====
@@ -254,28 +184,20 @@ fun GuardiaTipsScreen(
                             modifier = Modifier.align(Alignment.CenterStart)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBack,
+                                imageVector = Icons.Filled.ArrowBack,
                                 contentDescription = "Voltar",
                                 tint = Color(0xFF4B5563),
                                 modifier = Modifier.size(28.dp)
                             )
                         }
 
-                        Surface(
-                            shape = CircleShape,
-                            color = Color.White,
-                            shadowElevation = 8.dp,
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_dicas),
+                            contentDescription = "Escudo",
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
-                                .size(36.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Shield,
-                                contentDescription = "Guardiã",
-                                tint = Color(0xFF2563A7),
-                                modifier = Modifier.padding(7.dp)
-                            )
-                        }
+                                .size(70.dp)
+                        )
 
                         Row(
                             modifier = Modifier.align(Alignment.Center),
@@ -336,7 +258,6 @@ fun GuardiaTipsScreen(
                             modifier = Modifier.fillMaxSize(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            // título
                             Text(
                                 text = tip.title,
                                 fontSize = 26.sp,
@@ -347,7 +268,6 @@ fun GuardiaTipsScreen(
 
                             Spacer(Modifier.height(8.dp))
 
-                            // 🔥 área da imagem pega TODO o resto, ANCORADA EMBAIXO
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -358,15 +278,15 @@ fun GuardiaTipsScreen(
                                     painter = painterResource(id = tip.imageRes),
                                     contentDescription = null,
                                     modifier = Modifier
-                                        .fillMaxWidth(1.3f)
+                                        .fillMaxWidth(tip.imageWidthFraction)
                                         .graphicsLayer {
                                             transformOrigin = TransformOrigin(0.5f, 1f)
-                                            scaleX = 2.55f
-                                            scaleY = 2.55f
+                                            scaleX = tip.imageScale
+                                            scaleY = tip.imageScale
                                         }
                                         .offset(
-                                            x = if (tip.id == 2) 20.dp else 0.dp,  // ajuste card 2
-                                            y = 30.dp
+                                            x = tip.imageOffsetX,
+                                            y = tip.imageOffsetY
                                         ),
                                     contentScale = ContentScale.Fit
                                 )
@@ -400,14 +320,14 @@ fun GuardiaTipsScreen(
                 }
             }
 
-            // ===== Card FAQ (agora com imagem à esquerda) =====
+            // ===== Card FAQ =====
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp)
                     .clickable { showFaqDialog = true },
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF9EC5FF)), // azul do protótipo
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF9EC5FF)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Row(
@@ -417,14 +337,13 @@ fun GuardiaTipsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-
                     Image(
                         painter = painterResource(id = R.drawable.guardia_chat),
                         contentDescription = "Ilustração Guardiã FAQ",
                         modifier = Modifier
                             .size(90.dp)
                             .scale(2.7f)
-                            .offset(x = (-6).dp, y = 3.dp),  // 🔥 DESCE 10dp
+                            .offset(x = (-6).dp, y = 4.dp),
                         contentScale = ContentScale.Fit
                     )
 
@@ -438,7 +357,7 @@ fun GuardiaTipsScreen(
                             text = "Dúvidas sobre a Guardiã?",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF0E3B5E) // título escuro
+                            color = Color(0xFF0E3B5E)
                         )
 
                         Text(
@@ -449,7 +368,6 @@ fun GuardiaTipsScreen(
 
                         Spacer(Modifier.height(6.dp))
 
-                        // ⭐ BOTÃO IGUAL AO PROTÓTIPO
                         OutlinedButton(
                             onClick = { showFaqDialog = true },
                             shape = RoundedCornerShape(50),
@@ -470,16 +388,18 @@ fun GuardiaTipsScreen(
                 }
             }
 
-
             Spacer(modifier = Modifier.height(8.dp))
 
-            // ===== Bottom Bar (igual Home) =====
+            // ✅ Bottom bar
             GuardiaBottomBar(
                 currentRoute = "tips",
                 onItemClick = { route ->
                     when (route) {
-                        "home" -> onBackClick()
-                        else -> { /* aqui você conecta com o NavController depois */ }
+                        "home"   -> navController.navigate("home")
+                        "chat"   -> navController.navigate("guardia")
+                        "perfil" -> { /* navController.navigate("perfil") */ }
+                        "grupo"  -> { /* navController.navigate("grupo") */ }
+                        "config" -> { /* navController.navigate("config") */ }
                     }
                 }
             )
@@ -572,5 +492,6 @@ fun TipDialog(
 )
 @Composable
 fun GuardiaTipsScreenPreview() {
-    GuardiaTipsScreen()
+    val navController = rememberNavController()
+    GuardiaTipsScreen(navController = navController)
 }
