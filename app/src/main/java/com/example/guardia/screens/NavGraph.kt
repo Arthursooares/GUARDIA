@@ -49,12 +49,10 @@ fun AppNavGraph(navController: NavHostController) {
                             launchSingleTop = true
                         }
 
-                        // Se no futuro você tiver outras rotas com mesmo nome:
                         "perfil" -> navController.navigate("perfil")
                         "grupo"  -> navController.navigate("grupo")
                         "config" -> navController.navigate("config")
 
-                        // fallback genérico (se quiser manter)
                         else -> {
                             // navController.navigate(route)
                         }
@@ -77,15 +75,42 @@ fun AppNavGraph(navController: NavHostController) {
             GuardiaTipsScreen(navController = navController)
         }
 
+        // ⭐ Upgrade / Planos
         composable("upgrade") {
             UpgradeScreen(
                 onBackClick = { navController.popBackStack() }
             )
         }
 
+        // ⚙️ Configurações
         composable("config") {
             SettingsScreen(navController = navController)
         }
 
+        // 👤 Perfil
+        composable("perfil") {
+            PerfilScreen(
+                onItemClick = { route ->
+                    when (route) {
+                        "home" -> navController.navigate("home") {
+                            launchSingleTop = true
+                        }
+                        "perfil" -> {
+                            // já está na tela de perfil
+                        }
+                        "chat" -> navController.navigate("guardia")
+                        "grupo" -> navController.navigate("grupo")
+                        "config" -> navController.navigate("config")
+                    }
+                },
+                onNavigateToEdit = {
+                    // Quando você criar a tela de edição, é só descomentar:
+                    // navController.navigate("perfil_editar")
+                },
+                onNavigateToPlans = {
+                    navController.navigate("upgrade")   // 👉 botão "Planos Guardiã" vai pra tela de planos
+                }
+            )
+        }
     }
 }
