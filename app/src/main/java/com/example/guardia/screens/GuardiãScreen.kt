@@ -292,7 +292,7 @@ fun GuardiaScreen() {
                     // logo
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(
-                            painter = painterResource(id = R.drawable.ic_guardia_logo),
+                            painter = painterResource(id = R.drawable.ic_guardia_escudo),
                             contentDescription = "Logo Guardiã",
                             modifier = Modifier.size(130.dp)
                         )

@@ -4,18 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,7 +20,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -52,78 +40,95 @@ import com.example.guardia.ui.theme.GuardiaTheme
 @Composable
 fun PerfilScreen(
     onItemClick: (String) -> Unit = {},
-    onNavigateToEdit: () -> Unit // AQUI: Adicionamos o novo parâmetro
+    onNavigateToEdit: () -> Unit,
+    onNavigateToPlans: () -> Unit
 ) {
-    Scaffold(
-        bottomBar = {
-            CustomBottomAppBar(onItemClick = onItemClick)
-        },
-        containerColor = Color.Transparent
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFB4F5EF),
-                            Color(0xFF6EA9CE)
-                        )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFB4F5EF),
+                        Color(0xFF6EA9CE)
                     )
                 )
-                .padding(innerPadding)
+            )
+    ) {
+        // ===== CONTEÚDO SCROLLÁVEL =====
+        Column(
+            modifier = Modifier
+                .weight(1f) // ocupa o espaço de cima, deixando a bottom bar embaixo
+                .verticalScroll(rememberScrollState())
+                .padding(top = 32.dp, bottom = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(top = 32.dp, bottom = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // --- Seção da Imagem de Perfil ---
-                Box(contentAlignment = Alignment.BottomEnd) {
-                    Image(
-                        painter = painterResource(id = R.drawable.livia),
-                        contentDescription = "Foto de Perfil",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .clip(CircleShape)
-                            .border(4.dp, Color.White, CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+            // FOTO
+            Box(contentAlignment = Alignment.BottomEnd) {
+                Image(
+                    painter = painterResource(id = R.drawable.livia),
+                    contentDescription = "Foto de Perfil",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(CircleShape)
+                        .border(4.dp, Color.White, CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
-                // --- Nome e Email do Usuário ---
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "Livia Oliveira",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF14265B)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "São Paulo/SP",
-                        fontSize = 16.sp,
-                        color = Color(0xFF14265B)
-                    )
-                }
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(24.dp))
+            // NOME + INFO
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "Livia Oliveira",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF14265B)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "São Paulo/SP",
+                    fontSize = 16.sp,
+                    color = Color(0xFF14265B)
+                )
+            }
 
-                // --- Botões com ícones do drawable ---
-                Column(verticalArrangement = Arrangement.spacedBy(25.dp)) {
-                    // AQUI: Passamos a ação de clique para o botão Editar Perfil
-                    ProfileButton(text = "Editar Perfil", iconPainter = painterResource(id = R.drawable.person), onClick = onNavigateToEdit)
-                    ProfileButton(text = "Senha e segurança", iconPainter = painterResource(id = R.drawable.shield_check))
-                    ProfileButton(text = "Salvos", iconPainter = painterResource(id = R.drawable.saved))
-                    ProfileButton(text = "Planos Guardiã", iconPainter = painterResource(id = R.drawable.star))
-                    ProfileButton(text = "Ajuda", iconPainter = painterResource(id = R.drawable.help))
-                }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // BOTÕES
+            Column(verticalArrangement = Arrangement.spacedBy(25.dp)) {
+                ProfileButton(
+                    text = "Editar Perfil",
+                    iconPainter = painterResource(id = R.drawable.person),
+                    onClick = onNavigateToEdit
+                )
+                ProfileButton(
+                    text = "Senha e segurança",
+                    iconPainter = painterResource(id = R.drawable.shield_check)
+                )
+                ProfileButton(
+                    text = "Salvos",
+                    iconPainter = painterResource(id = R.drawable.saved)
+                )
+                ProfileButton(
+                    text = "Planos Guardiã",
+                    iconPainter = painterResource(id = R.drawable.star),
+                    onClick = onNavigateToPlans        // ➜ navega pra planos
+                )
+                ProfileButton(
+                    text = "Ajuda",
+                    iconPainter = painterResource(id = R.drawable.help)
+                )
             }
         }
+
+        // ===== BOTTOM BAR IGUAL ÀS OUTRAS TELAS =====
+        GuardiaBottomBar(
+            currentRoute = "perfil",
+            onItemClick = { route -> onItemClick(route) }
+        )
     }
 }
 
@@ -138,7 +143,7 @@ fun ProfileButton(text: String, iconPainter: Painter, onClick: () -> Unit = {}) 
 @Composable
 fun ProfileButtonBase(text: String, onClick: () -> Unit, iconContent: @Composable () -> Unit) {
     Button(
-        onClick = onClick, // AQUI: Usamos a ação de clique recebida
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp),
@@ -170,20 +175,17 @@ fun ProfileButtonBase(text: String, onClick: () -> Unit, iconContent: @Composabl
     }
 }
 
-// --- COMPONENTE DA BARRA DE NAVEGAÇÃO CUSTOMIZADA ---
 @Composable
 fun CustomBottomAppBar(onItemClick: (String) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp) // Altura total da área da barra
-
+            .height(80.dp)
     ) {
-        // A barra cinza com cantos arredondados, desenhada atrás
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 20.dp) // Deixa espaço para o FAB "saltar" para fora
+                .padding(top = 20.dp)
                 .background(
                     color = Color(0xFFF0F4F8),
                     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
@@ -193,14 +195,12 @@ fun CustomBottomAppBar(onItemClick: (String) -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Ícones
                 IconButton(onClick = { onItemClick("perfil") }, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Outlined.Person, contentDescription = "Perfil", tint = Color(0xFF0E3B5E))
                 }
                 IconButton(onClick = { onItemClick("chat") }, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Outlined.ChatBubbleOutline, contentDescription = "Chat", tint = Color(0xFF0E3B5E))
                 }
-                // Espaço vazio para o FAB
                 Spacer(modifier = Modifier.width(60.dp))
                 IconButton(onClick = { onItemClick("grupo") }, modifier = Modifier.weight(1f)) {
                     Icon(Icons.Outlined.Group, contentDescription = "Grupo", tint = Color(0xFF0E3B5E))
@@ -211,10 +211,9 @@ fun CustomBottomAppBar(onItemClick: (String) -> Unit) {
             }
         }
 
-        // O FAB, desenhado por último para ficar na frente
         FloatingActionButton(
             onClick = { onItemClick("home") },
-            modifier = Modifier.align(Alignment.TopCenter), // Alinhado ao topo e centro do container
+            modifier = Modifier.align(Alignment.TopCenter),
             shape = CircleShape,
             containerColor = Color(0xFF0E3B5E),
             contentColor = Color.White
@@ -228,6 +227,9 @@ fun CustomBottomAppBar(onItemClick: (String) -> Unit) {
 @Composable
 fun PerfilScreenPreview() {
     GuardiaTheme {
-        PerfilScreen(onNavigateToEdit = {}) // Adicionado para o preview não quebrar
+        PerfilScreen(
+            onNavigateToEdit = {},
+            onNavigateToPlans = {}
+        )
     }
 }

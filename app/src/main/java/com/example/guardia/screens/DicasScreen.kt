@@ -391,18 +391,22 @@ fun GuardiaTipsScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // ✅ Bottom bar
+            // ✅ Bottom bar
             GuardiaBottomBar(
                 currentRoute = "tips",
                 onItemClick = { route ->
                     when (route) {
-                        "home"   -> navController.navigate("home")
-                        "chat"   -> navController.navigate("guardia")
-                        "perfil" -> { /* navController.navigate("perfil") */ }
-                        "grupo"  -> { /* navController.navigate("grupo") */ }
-                        "config" -> { /* navController.navigate("config") */ }
+                        "home" -> navController.navigate("home") {
+                            launchSingleTop = true
+                        }
+                        "chat" -> navController.navigate("guardia")
+                        "perfil" -> navController.navigate("perfil")
+                        "grupo" -> navController.navigate("grupo")
+                        "config" -> navController.navigate("config")
                     }
                 }
             )
+
         }
 
         if (showFaqDialog) {

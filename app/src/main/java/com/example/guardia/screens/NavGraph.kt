@@ -49,15 +49,11 @@ fun AppNavGraph(navController: NavHostController) {
                             launchSingleTop = true
                         }
 
-                        // Se no futuro você tiver outras rotas com mesmo nome:
-                        "perfil" -> navController.navigate("perfil")
-                        "grupo"  -> navController.navigate("grupo")
-                        "config" -> navController.navigate("config")
-
-                        // fallback genérico (se quiser manter)
-                        else -> {
-                            // navController.navigate(route)
-                        }
+                        "perfil"   -> navController.navigate("perfil")
+                        "grupo"    -> navController.navigate("grupo")
+                        "config"   -> navController.navigate("config")
+                        "feedback" -> navController.navigate("feedback") // 👉 se você usar essa rota na bottom bar
+                        else -> { /* navController.navigate(route) */ }
                     }
                 },
                 onChatClick = {
@@ -77,15 +73,45 @@ fun AppNavGraph(navController: NavHostController) {
             GuardiaTipsScreen(navController = navController)
         }
 
+        // ⭐ Upgrade / Planos
         composable("upgrade") {
             UpgradeScreen(
                 onBackClick = { navController.popBackStack() }
             )
         }
 
+        // ⚙️ Configurações
         composable("config") {
             SettingsScreen(navController = navController)
         }
 
+        // 👤 Perfil
+        composable("perfil") {
+            PerfilScreen(
+                onItemClick = { route ->
+                    when (route) {
+                        "home" -> navController.navigate("home") {
+                            launchSingleTop = true
+                        }
+                        "perfil" -> { /* já está nela */ }
+                        "chat"   -> navController.navigate("guardia")
+                        "tips"   -> navController.navigate("tips")
+                        "config" -> navController.navigate("config")
+                        "feedback" -> navController.navigate("feedback") // 👉 se tiver opção de feedback no perfil
+                    }
+                },
+                onNavigateToEdit = {},
+                onNavigateToPlans = {
+                    navController.navigate("upgrade")
+                }
+            )
+        }
+
+        // 📝 Feedback
+        composable("feedback") {
+            FeedbackScreen(
+                onBackClick = { navController.popBackStack() } // seta volta pra tela anterior
+            )
+        }
     }
 }
