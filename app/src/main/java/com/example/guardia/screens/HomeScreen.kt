@@ -349,12 +349,13 @@ fun HomeScreen(
                 title = "Feedbacks",
                 imageRes = R.drawable.ic_feedbacks,
                 onClick = {
-                    // TODO: implementar tela de feedbacks no futuro
+                    navController.navigate("feedback")
                 },
                 imageSize = 70.dp,
                 imageScale = 1.8f,
                 imageOffsetY = 0.dp
             )
+
 
             Spacer(Modifier.height(16.dp))
         }

@@ -49,13 +49,11 @@ fun AppNavGraph(navController: NavHostController) {
                             launchSingleTop = true
                         }
 
-                        "perfil" -> navController.navigate("perfil")
-                        "grupo"  -> navController.navigate("grupo")
-                        "config" -> navController.navigate("config")
-
-                        else -> {
-                            // navController.navigate(route)
-                        }
+                        "perfil"   -> navController.navigate("perfil")
+                        "grupo"    -> navController.navigate("grupo")
+                        "config"   -> navController.navigate("config")
+                        "feedback" -> navController.navigate("feedback") // 👉 se você usar essa rota na bottom bar
+                        else -> { /* navController.navigate(route) */ }
                     }
                 },
                 onChatClick = {
@@ -95,17 +93,24 @@ fun AppNavGraph(navController: NavHostController) {
                         "home" -> navController.navigate("home") {
                             launchSingleTop = true
                         }
-                        "perfil" -> {
-                        }
-                        "chat" -> navController.navigate("guardia")
-                        "tips" -> navController.navigate("tips")
+                        "perfil" -> { /* já está nela */ }
+                        "chat"   -> navController.navigate("guardia")
+                        "tips"   -> navController.navigate("tips")
                         "config" -> navController.navigate("config")
+                        "feedback" -> navController.navigate("feedback") // 👉 se tiver opção de feedback no perfil
                     }
                 },
                 onNavigateToEdit = {},
                 onNavigateToPlans = {
-                    navController.navigate("upgrade")   // 👉 botão "Planos Guardiã" vai pra tela de planos
+                    navController.navigate("upgrade")
                 }
+            )
+        }
+
+        // 📝 Feedback
+        composable("feedback") {
+            FeedbackScreen(
+                onBackClick = { navController.popBackStack() } // seta volta pra tela anterior
             )
         }
     }
