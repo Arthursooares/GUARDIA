@@ -17,8 +17,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubble
-import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -99,15 +99,15 @@ fun GuardiaBottomBar(
                 // Espaço pro botão central flutuante
                 Spacer(modifier = Modifier.width(56.dp))
 
-                // Grupo
+                // Dicas (ANTES era Grupo)
                 IconButton(
-                    onClick = { onItemClick("grupo") },
+                    onClick = { onItemClick("tips") },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Group,
-                        contentDescription = "Grupo",
-                        tint = if (currentRoute == "grupo") PrimaryBlue else TitleDark
+                        imageVector = Icons.Filled.Lightbulb,
+                        contentDescription = "Dicas",
+                        tint = if (currentRoute == "tips") PrimaryBlue else TitleDark
                     )
                 }
 

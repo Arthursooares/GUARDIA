@@ -96,17 +96,13 @@ fun AppNavGraph(navController: NavHostController) {
                             launchSingleTop = true
                         }
                         "perfil" -> {
-                            // já está na tela de perfil
                         }
                         "chat" -> navController.navigate("guardia")
-                        "grupo" -> navController.navigate("grupo")
+                        "tips" -> navController.navigate("tips")
                         "config" -> navController.navigate("config")
                     }
                 },
-                onNavigateToEdit = {
-                    // Quando você criar a tela de edição, é só descomentar:
-                    // navController.navigate("perfil_editar")
-                },
+                onNavigateToEdit = {},
                 onNavigateToPlans = {
                     navController.navigate("upgrade")   // 👉 botão "Planos Guardiã" vai pra tela de planos
                 }

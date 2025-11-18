@@ -41,7 +41,7 @@ import com.example.guardia.ui.theme.GuardiaTheme
 fun PerfilScreen(
     onItemClick: (String) -> Unit = {},
     onNavigateToEdit: () -> Unit,
-    onNavigateToPlans: () -> Unit   // ➜ novo callback para a tela de planos
+    onNavigateToPlans: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -115,7 +115,7 @@ fun PerfilScreen(
                 ProfileButton(
                     text = "Planos Guardiã",
                     iconPainter = painterResource(id = R.drawable.star),
-                    onClick = onNavigateToPlans        // ➜ agora navega pra planos
+                    onClick = onNavigateToPlans        // ➜ navega pra planos
                 )
                 ProfileButton(
                     text = "Ajuda",
@@ -175,7 +175,6 @@ fun ProfileButtonBase(text: String, onClick: () -> Unit, iconContent: @Composabl
     }
 }
 
-// --- COMPONENTE DA BARRA DE NAVEGAÇÃO CUSTOMIZADA (GUARDADO CASO QUEIRA USAR) ---
 @Composable
 fun CustomBottomAppBar(onItemClick: (String) -> Unit) {
     Box(

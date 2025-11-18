@@ -175,7 +175,7 @@ fun HomeScreen(
     onChatClick: () -> Unit = {},
     onItemClick: (String) -> Unit = {}
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(
@@ -188,189 +188,190 @@ fun HomeScreen(
                 )
             )
     ) {
-        Column(Modifier.fillMaxSize()) {
 
-            // Top Bar
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, start = 12.dp, end = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                PerfilMenuButton(
-                    onPerfilClick = { navController.navigate("perfil") },
-                    onConfigClick = { navController.navigate("config") }
-                )
-
-            }
-
-            // Conteúdo (scroll)
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                Text(
-                    text = buildAnnotatedString {
-                        append("Bem vindo(a), ")
-                        withStyle(SpanStyle(color = PrimaryBlue, fontWeight = FontWeight.Bold)) {
-                            append(userName)
-                        }
-                        append("!")
-                    },
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = TitleDark,
-                    modifier = Modifier.padding(top = 6.dp, bottom = 12.dp)
-                )
-
-                // Card principal
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .shadow(8.dp, RoundedCornerShape(28.dp), clip = false)
-                        .background(
-                            brush = Brush.horizontalGradient(listOf(PrimaryTeal, PrimaryBlue)),
-                            shape = RoundedCornerShape(28.dp)
-                        )
-                        .padding(18.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(end = 8.dp)
-                        ) {
-                            Text(
-                                "Converse com a Guardiã",
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Spacer(Modifier.height(6.dp))
-                            Text(
-                                "Algum problema ou dúvida?\nVamos resolver isso juntas!",
-                                color = Color.White.copy(alpha = 0.95f),
-                                fontSize = 12.sp,
-                                lineHeight = 16.sp
-                            )
-                            Spacer(Modifier.height(12.dp))
-                            Button(
-                                onClick = onChatClick,
-                                colors = ButtonDefaults.buttonColors(containerColor = AzureLight),
-                                shape = RoundedCornerShape(50),
-                                contentPadding = PaddingValues(horizontal = 18.dp, vertical = 6.dp),
-                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-                            ) {
-                                Text(
-                                    "Comece agora",
-                                    color = PrimaryBlue,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .width(110.dp),
-                            contentAlignment = Alignment.BottomEnd
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.personagem),
-                                contentDescription = "Personagem Guardiã",
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .aspectRatio(0.6f)
-                                    .graphicsLayer {
-                                        scaleX = 1.8f
-                                        scaleY = 1.8f
-                                        translationY = (-26).dp.toPx()   // sobe a imagem
-                                        translationX = (-12).dp.toPx()   // move para a esquerda
-                                        transformOrigin = TransformOrigin.Center
-                                    },
-                                contentScale = ContentScale.Fit
-                            )
-
-
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(20.dp))
-
-                // Card "Dicas da Guardiã" -> navega para a tela de dicas
-                TipsCard(
-                    imageRes = R.drawable.ic_dicas,
-                    onClick = {
-                        navController.navigate("tips")
-                    },
-                    imageSize = 72.dp,
-                    imageScale = 1.3f,
-                    imageOffsetY = 0.dp
-                )
-
-                Spacer(Modifier.height(14.dp))
-
-                ImageCard(
-                    title = "Meus Relatórios",
-                    imageRes = R.drawable.ic_relatorios,
-                    onClick = { onItemClick("Meus Relatórios") },
-                    imageSize = 70.dp,
-                    imageScale = 1.0f,
-                    imageOffsetY = 0.dp
-                )
-                Spacer(Modifier.height(14.dp))
-
-                ImageCard(
-                    title = "Upgrade Guardiã",
-                    imageRes = R.drawable.estrela,
-                    onClick = {
-                        navController.navigate("upgrade")
-                    },
-                    imageSize = 74.dp,
-                    imageScale = 1.6f,
-                    imageOffsetX = (-3).dp,
-                    imageOffsetY = (-1).dp
-                )
-
-                Spacer(Modifier.height(14.dp))
-
-                ImageCard(
-                    title = "Feedbacks",
-                    imageRes = R.drawable.ic_feedbacks,
-                    onClick = { onItemClick("Feedbacks") },
-                    imageSize = 70.dp,
-                    imageScale = 1.8f,
-                    imageOffsetY = 0.dp
-                )
-
-                Spacer(Modifier.height(16.dp))
-            }
-
-            // ✅ Bottom bar compartilhada
-            GuardiaBottomBar(
-                currentRoute = "home",
-                onItemClick = { route ->
-                    // Aqui você decide o que cada item faz
-                    when (route) {
-                        "home"   -> navController.navigate("home")
-                        "perfil" -> navController.navigate("perfil")
-
-                        "grupo"  -> navController.navigate("grupo")
-                        "config" -> navController.navigate("config")
-                    }
-                }
+        // Top Bar
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, start = 12.dp, end = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            PerfilMenuButton(
+                onPerfilClick = { navController.navigate("perfil") },
+                onConfigClick = { navController.navigate("config") }
             )
         }
+
+        // Conteúdo (scroll)
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Text(
+                text = buildAnnotatedString {
+                    append("Bem vindo(a), ")
+                    withStyle(SpanStyle(color = PrimaryBlue, fontWeight = FontWeight.Bold)) {
+                        append(userName)
+                    }
+                    append("!")
+                },
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TitleDark,
+                modifier = Modifier.padding(top = 6.dp, bottom = 12.dp)
+            )
+
+            // Card principal
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .shadow(8.dp, RoundedCornerShape(28.dp), clip = false)
+                    .background(
+                        brush = Brush.horizontalGradient(listOf(PrimaryTeal, PrimaryBlue)),
+                        shape = RoundedCornerShape(28.dp)
+                    )
+                    .padding(18.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp)
+                    ) {
+                        Text(
+                            "Converse com a Guardiã",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            "Algum problema ou dúvida?\nVamos resolver isso juntas!",
+                            color = Color.White.copy(alpha = 0.95f),
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Button(
+                            onClick = onChatClick,
+                            colors = ButtonDefaults.buttonColors(containerColor = AzureLight),
+                            shape = RoundedCornerShape(50),
+                            contentPadding = PaddingValues(horizontal = 18.dp, vertical = 6.dp),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
+                        ) {
+                            Text(
+                                "Comece agora",
+                                color = PrimaryBlue,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(110.dp),
+                        contentAlignment = Alignment.BottomEnd
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.personagem),
+                            contentDescription = "Personagem Guardiã",
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .aspectRatio(0.6f)
+                                .graphicsLayer {
+                                    scaleX = 1.8f
+                                    scaleY = 1.8f
+                                    translationY = (-26).dp.toPx()   // sobe a imagem
+                                    translationX = (-12).dp.toPx()   // move para a esquerda
+                                    transformOrigin = TransformOrigin.Center
+                                },
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            // Card "Dicas da Guardiã" -> navega para a tela de dicas
+            TipsCard(
+                imageRes = R.drawable.ic_dicas,
+                onClick = {
+                    navController.navigate("tips")
+                },
+                imageSize = 72.dp,
+                imageScale = 1.3f,
+                imageOffsetY = 0.dp
+            )
+
+            Spacer(Modifier.height(14.dp))
+
+            // 🔹 Meus Relatórios — sem rota por enquanto (evita crash)
+            ImageCard(
+                title = "Meus Relatórios",
+                imageRes = R.drawable.ic_relatorios,
+                onClick = {
+                    // TODO: implementar tela de relatórios no futuro
+                },
+                imageSize = 70.dp,
+                imageScale = 1.0f,
+                imageOffsetY = 0.dp
+            )
+
+            Spacer(Modifier.height(14.dp))
+
+            ImageCard(
+                title = "Upgrade Guardiã",
+                imageRes = R.drawable.estrela,
+                onClick = {
+                    navController.navigate("upgrade")
+                },
+                imageSize = 74.dp,
+                imageScale = 1.6f,
+                imageOffsetX = (-3).dp,
+                imageOffsetY = (-1).dp
+            )
+
+            Spacer(Modifier.height(14.dp))
+
+            // 🔹 Feedbacks — sem rota por enquanto (evita crash)
+            ImageCard(
+                title = "Feedbacks",
+                imageRes = R.drawable.ic_feedbacks,
+                onClick = {
+                    // TODO: implementar tela de feedbacks no futuro
+                },
+                imageSize = 70.dp,
+                imageScale = 1.8f,
+                imageOffsetY = 0.dp
+            )
+
+            Spacer(Modifier.height(16.dp))
+        }
+
+        // ✅ Bottom bar compartilhada
+        GuardiaBottomBar(
+            currentRoute = "home",
+            onItemClick = { route ->
+                when (route) {
+                    "home"   -> navController.navigate("home") { launchSingleTop = true }
+                    "perfil" -> navController.navigate("perfil")
+                    "chat"   -> navController.navigate("guardia")
+                    "tips"   -> navController.navigate("tips")
+                    "config" -> navController.navigate("config")
+                }
+            }
+        )
     }
 }
 
@@ -392,7 +393,7 @@ fun PerfilMenuButton(
             Icon(
                 imageVector = Icons.Filled.Menu,
                 contentDescription = "Menu",
-                tint = TitleDark
+                tint = Color(0xFF0E3B5E)
             )
         }
 
