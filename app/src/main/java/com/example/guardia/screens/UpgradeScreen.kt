@@ -255,14 +255,14 @@ private fun PlanCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Parágrafo inicial (link sublinhado se Essentials)
+
             Text(
                 text = descriptionParagraph,
                 style = TextStyle(
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Normal,
-                    color = if (showLinkStyleOnParagraph) UpgradePriceLilac else UpgradeCardText,
-                    textDecoration = if (showLinkStyleOnParagraph) TextDecoration.Underline else TextDecoration.None
+                    color = UpgradeCardText,
+                    textDecoration = TextDecoration.None
                 ),
                 modifier = if (showLinkStyleOnParagraph) {
                     Modifier
@@ -314,9 +314,9 @@ private fun PlanCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Botão
-            val buttonColor =
+            val buttonColor = 
                 if (isCurrentPlan) UpgradeCurrentPlanButton else UpgradePrimaryGreen
-            val textColor =
+            val textColor = 
                 if (isCurrentPlan) UpgradeCardText else Color.White
 
             Button(

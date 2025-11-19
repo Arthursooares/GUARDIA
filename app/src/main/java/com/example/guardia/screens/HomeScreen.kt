@@ -1,5 +1,6 @@
 package com.example.guardia.screens
 
+// ================= IMPORTS =================
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,13 +13,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -32,17 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.guardia.R
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 
-// ---------- Paleta ----------
-private val AzureLight = Color(0xFFE8F5FF)
-private val AzureMid   = Color(0xFFD3ECFF)
+// ================= CORES E ESTILOS =================
 private val TitleDark  = Color(0xFF0E3B5E)
 private val PrimaryTeal = Color(0xFF33B2B2)
 private val PrimaryBlue = Color(0xFF0E6D90)
@@ -257,12 +252,12 @@ fun HomeScreen(
                             "Algum problema ou dúvida?\nVamos resolver isso juntas!",
                             color = Color.White.copy(alpha = 0.95f),
                             fontSize = 12.sp,
-                            lineHeight = 16.sp
+                            lineHeight = 12.sp
                         )
                         Spacer(Modifier.height(12.dp))
                         Button(
                             onClick = onChatClick,
-                            colors = ButtonDefaults.buttonColors(containerColor = AzureLight),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                             shape = RoundedCornerShape(50),
                             contentPadding = PaddingValues(horizontal = 18.dp, vertical = 6.dp),
                             elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)

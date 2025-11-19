@@ -3,6 +3,7 @@ package com.example.guardia.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,7 +23,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -36,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -48,10 +51,21 @@ import com.example.guardia.R
 import com.example.guardia.ui.theme.GuardiaTheme
 
 @Composable
-fun EditScreen() {
-    var nome by remember { mutableStateOf("Livia") }
-    var sobrenome by remember { mutableStateOf("Oliveira") }
+fun EditScreen(onUpdateClick: () -> Unit = {}) {
+    var nome by remember { mutableStateOf("") }
+    var sobrenome by remember { mutableStateOf("") }
     var estado by remember { mutableStateOf("São Paulo") }
+    var isStateDropdownExpanded by remember { mutableStateOf(false) }
+
+    val brazilianStates = remember {
+        listOf(
+            "Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", "Espírito Santo",
+            "Goiás", "Maranhão", "Mato Grosso", "Minas Gerais", "Pará", "Paraíba", 
+            "Paraná", "Pernambuco", "Piauí", "Rio de Janeiro", "Rio Grande do Norte",
+            "Rio Grande do Sul", "Rondônia", "Roraima", "Santa Catarina", "São Paulo", 
+            "Sergipe", "Tocantins"
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -86,14 +100,14 @@ fun EditScreen() {
                         modifier = Modifier
                             .size(150.dp)
                             .clip(CircleShape)
-                            .border(4.dp, Color.White, CircleShape), // AQUI: Adicionamos a borda
+                            .border(4.dp, White, CircleShape),
                         contentScale = ContentScale.Crop
                     )
                     IconButton(
                         onClick = { /* Lógica para editar a foto */ },
                         modifier = Modifier
                             .size(40.dp)
-                            .background(Color.White, CircleShape)
+                            .background(White, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
@@ -112,21 +126,40 @@ fun EditScreen() {
                 Spacer(modifier = Modifier.height(24.dp))
                 StyledEditTextField(label = "Sobrenome", value = sobrenome, onValueChange = { sobrenome = it })
                 Spacer(modifier = Modifier.height(24.dp))
-                StyledEditTextField(
-                    label = "Estado",
-                    value = estado,
-                    onValueChange = { estado = it },
-                    trailingIcon = {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown", tint = Color(0xFF1E40AF))
+
+                // --- Campo de Estado com Dropdown ---
+                Box {
+                    StyledEditTextField(
+                        label = "Estado",
+                        value = estado,
+                        onValueChange = { estado = it },
+                        readOnly = true, // Impede a edição direta pelo teclado
+                        onClick = { isStateDropdownExpanded = true }, // Abre o menu ao clicar
+                        trailingIcon = {
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown", tint = Color(0xFF1E40AF))
+                        }
+                    )
+
+                    DropdownMenu(
+                        expanded = isStateDropdownExpanded,
+                        onDismissRequest = { isStateDropdownExpanded = false },
+                        modifier = Modifier.background(Color.White)
+                    ) {
+                        brazilianStates.forEach { stateName ->
+                            DropdownMenuItem(text = { Text(stateName) }, onClick = {
+                                estado = stateName
+                                isStateDropdownExpanded = false
+                            })
+                        }
                     }
-                )
+                }
             }
 
-            Spacer(modifier = Modifier.height(220.dp))
+            Spacer(modifier = Modifier.height(130.dp))
 
             // --- Botão Atualizar ---
             Button(
-                onClick = { /* TODO: Handle update */ },
+                onClick = onUpdateClick, // AQUI: Conectamos a função
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -135,7 +168,7 @@ fun EditScreen() {
                     containerColor = Color(0xFF1E40AF)
                 )
             ) {
-                Text(text = "Atualizar", fontSize = 18.sp, color = Color.White)
+                Text(text = "Atualizar", fontSize = 18.sp, color = White)
             }
         }
     }
@@ -149,9 +182,11 @@ fun StyledEditTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
+    readOnly: Boolean = false,
+    onClick: () -> Unit = {},
     trailingIcon: @Composable (() -> Unit)? = null
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Text(
             text = label,
             color = Color(0xFF1E40AF),
@@ -163,7 +198,7 @@ fun StyledEditTextField(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White.copy(alpha = 0.7f), shape = CircleShape)
+                .background(White.copy(alpha = 0.7f), shape = CircleShape)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             contentAlignment = Alignment.CenterStart
         ) {
@@ -174,6 +209,7 @@ fun StyledEditTextField(
                     value = value,
                     onValueChange = onValueChange,
                     modifier = Modifier.weight(1f),
+                    readOnly = readOnly,
                     textStyle = TextStyle(
                         color = Color(0xFF1E40AF),
                         fontSize = 18.sp
@@ -194,6 +230,6 @@ fun StyledEditTextField(
 @Composable
 fun EditScreenPreview() {
     GuardiaTheme {
-        EditScreen()
+        EditScreen(onUpdateClick = {}) // Adicionado para o preview não quebrar
     }
 }

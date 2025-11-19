@@ -41,6 +41,8 @@ import com.example.guardia.ui.theme.GuardiaTheme
 fun PerfilScreen(
     onItemClick: (String) -> Unit = {},
     onNavigateToEdit: () -> Unit,
+    onNavigateToSecurity: () -> Unit,
+    onNavigateToSaved: () -> Unit,
     onNavigateToPlans: () -> Unit
 ) {
     Column(
@@ -106,11 +108,13 @@ fun PerfilScreen(
                 )
                 ProfileButton(
                     text = "Senha e segurança",
-                    iconPainter = painterResource(id = R.drawable.shield_check)
+                    iconPainter = painterResource(id = R.drawable.shield_check),
+                    onClick = onNavigateToSecurity // Conectado!
                 )
                 ProfileButton(
                     text = "Salvos",
-                    iconPainter = painterResource(id = R.drawable.saved)
+                    iconPainter = painterResource(id = R.drawable.saved),
+                    onClick = onNavigateToSaved // Conectado!
                 )
                 ProfileButton(
                     text = "Planos Guardiã",
@@ -229,7 +233,9 @@ fun PerfilScreenPreview() {
     GuardiaTheme {
         PerfilScreen(
             onNavigateToEdit = {},
-            onNavigateToPlans = {}
+            onNavigateToPlans = {},
+            onNavigateToSecurity = {},
+            onNavigateToSaved = {}
         )
     }
 }

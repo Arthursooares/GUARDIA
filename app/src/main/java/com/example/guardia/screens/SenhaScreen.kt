@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -25,10 +26,18 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,6 +48,9 @@ fun SenhaScreen(
     onBackClick: () -> Unit = {},
     onItemClick: (String) -> Unit = {}
 ) {
+    var email by remember { mutableStateOf("") }
+    var senha by remember { mutableStateOf("") }
+
     Scaffold(
         topBar = { SenhaTopAppBar(onBackClick = onBackClick) },
         bottomBar = { GuardiaBottomBar(currentRoute = "senha", onItemClick = onItemClick) },
@@ -63,11 +75,16 @@ fun SenhaScreen(
 
             Spacer(modifier = Modifier.height(60.dp))
 
-            InfoField(label = "Email", value = "liviaoliveira20@gmail.com")
+            InfoField(label = "Email", value = email, onValueChange = { email = it })
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            InfoField(label = "Senha", value = "●●●●●●●●●●●●")
+            InfoField(
+                label = "Senha",
+                value = senha,
+                onValueChange = { senha = it },
+                visualTransformation = PasswordVisualTransformation('●')
+            )
 
             Spacer(modifier = Modifier.height(80.dp))
 
@@ -131,7 +148,12 @@ private fun SenhaTopAppBar(onBackClick: () -> Unit) {
 }
 
 @Composable
-private fun InfoField(label: String, value: String) {
+private fun InfoField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    visualTransformation: VisualTransformation = VisualTransformation.None
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
@@ -144,12 +166,23 @@ private fun InfoField(label: String, value: String) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White.copy(alpha = 0.4f), shape = CircleShape) // Fundo mais transparente
-                .border(2.dp, Color.White.copy(alpha = 0.8f), CircleShape) // Borda mais visível
+                .background(Color.White.copy(alpha = 0.4f), shape = CircleShape) 
+                .border(1.dp, Color.White.copy(alpha = 0.8f), CircleShape) 
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             contentAlignment = Alignment.CenterStart
         ) {
-            Text(text = value, color = Color(0xFF666666).copy(alpha = 0.8f), fontSize = 20.sp)
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(
+                    color = Color(0xFF1E40AF).copy(alpha = 0.8f),
+                    fontSize = 20.sp
+                ),
+                visualTransformation = visualTransformation,
+                cursorBrush = SolidColor(Color(0xFF1E40AF)),
+                singleLine = true
+            )
         }
     }
 }

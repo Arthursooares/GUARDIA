@@ -100,7 +100,9 @@ fun AppNavGraph(navController: NavHostController) {
                         "feedback" -> navController.navigate("feedback") // 👉 se tiver opção de feedback no perfil
                     }
                 },
-                onNavigateToEdit = {},
+                onNavigateToEdit = { navController.navigate("editProfile") },
+                onNavigateToSecurity = { navController.navigate("security") },
+                onNavigateToSaved = { navController.navigate("saved") },
                 onNavigateToPlans = {
                     navController.navigate("upgrade")
                 }
@@ -112,6 +114,17 @@ fun AppNavGraph(navController: NavHostController) {
             FeedbackScreen(
                 onBackClick = { navController.popBackStack() } // seta volta pra tela anterior
             )
+        }
+
+        // Novas rotas
+        composable("editProfile") {
+            EditScreen(onUpdateClick = { navController.popBackStack() }) // AQUI: Conectamos a navegação
+        }
+        composable("security") {
+            SenhaScreen(onBackClick = { navController.popBackStack() })
+        }
+        composable("saved") {
+            SalvosScreen(onBackClick = { navController.popBackStack() })
         }
     }
 }
