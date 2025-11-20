@@ -41,34 +41,29 @@ fun AppNavGraph(navController: NavHostController) {
                 navController = navController,
                 onItemClick = { route ->
                     when (route) {
-                        // ÍCONE DE CHAT DA BOTTOM BAR
-                        "chat" -> navController.navigate("guardia")
 
-                        // Botão flutuante ou outros que mandem "home"
-                        "home" -> navController.navigate("home") {
-                            launchSingleTop = true
-                        }
+                        // bottom bar:
+                        "chat"   -> navController.navigate("guardia")
+                        "home"   -> navController.navigate("home") { launchSingleTop = true }
+                        "perfil" -> navController.navigate("perfil")
+                        "tips"   -> navController.navigate("tips")
+                        "config" -> navController.navigate("config")
 
-                        "perfil"   -> navController.navigate("perfil")
-                        "grupo"    -> navController.navigate("grupo")
-                        "config"   -> navController.navigate("config")
-                        "feedback" -> navController.navigate("feedback") // 👉 se você usar essa rota na bottom bar
-                        else -> { /* navController.navigate(route) */ }
+                        else -> {}
                     }
                 },
                 onChatClick = {
-                    // Botão grande "Converse com a Guardiã"
                     navController.navigate("guardia")
                 }
             )
         }
 
-        // 🟣 Guardia (tela de chat)
+        // 🟣 Guardia (chat)
         composable("guardia") {
             GuardiaScreen()
         }
 
-        // 🔹 Tela de Dicas
+        // 🔹 Dicas
         composable("tips") {
             GuardiaTipsScreen(navController = navController)
         }
@@ -90,39 +85,47 @@ fun AppNavGraph(navController: NavHostController) {
             PerfilScreen(
                 onItemClick = { route ->
                     when (route) {
-                        "home" -> navController.navigate("home") {
-                            launchSingleTop = true
-                        }
-                        "perfil" -> { /* já está nela */ }
+                        "home"   -> navController.navigate("home") { launchSingleTop = true }
+                        "perfil" -> { /* já está aqui */ }
                         "chat"   -> navController.navigate("guardia")
                         "tips"   -> navController.navigate("tips")
                         "config" -> navController.navigate("config")
-                        "feedback" -> navController.navigate("feedback") // 👉 se tiver opção de feedback no perfil
                     }
                 },
                 onNavigateToEdit = { navController.navigate("editProfile") },
                 onNavigateToSecurity = { navController.navigate("security") },
                 onNavigateToSaved = { navController.navigate("saved") },
-                onNavigateToPlans = {
-                    navController.navigate("upgrade")
-                }
+                onNavigateToPlans = { navController.navigate("upgrade") }
             )
         }
 
         // 📝 Feedback
         composable("feedback") {
             FeedbackScreen(
-                onBackClick = { navController.popBackStack() } // seta volta pra tela anterior
+                onBackClick = { navController.popBackStack() },
+                onBottomItemClick = { route ->
+                    when (route) {
+                        "home"   -> navController.navigate("home")
+                        "perfil" -> navController.navigate("perfil")
+                        "chat"   -> navController.navigate("guardia")
+                        "tips"   -> navController.navigate("tips")
+                        "config" -> navController.navigate("config")
+                    }
+                }
             )
         }
 
-        // Novas rotas
+        // ⭐ Editar perfil
         composable("editProfile") {
-            EditScreen(onUpdateClick = { navController.popBackStack() }) // AQUI: Conectamos a navegação
+            EditScreen(onUpdateClick = { navController.popBackStack() })
         }
+
+        // 🔐 Segurança
         composable("security") {
             SenhaScreen(onBackClick = { navController.popBackStack() })
         }
+
+        // 💾 Salvos
         composable("saved") {
             SalvosScreen(onBackClick = { navController.popBackStack() })
         }
