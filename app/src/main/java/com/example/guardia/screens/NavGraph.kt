@@ -53,6 +53,7 @@ fun AppNavGraph(navController: NavHostController) {
                     }
                 },
                 onChatClick = {
+                    // Botão grande "Converse com a Guardiã"
                     navController.navigate("guardia")
                 }
             )
@@ -90,6 +91,7 @@ fun AppNavGraph(navController: NavHostController) {
                         "chat"   -> navController.navigate("guardia")
                         "tips"   -> navController.navigate("tips")
                         "config" -> navController.navigate("config")
+                        "feedback" -> navController.navigate("feedback") // 👉 se tiver opção de feedback no perfil
                     }
                 },
                 onNavigateToEdit = { navController.navigate("editProfile") },
@@ -129,9 +131,17 @@ fun AppNavGraph(navController: NavHostController) {
         composable("saved") {
             SalvosScreen(onBackClick = { navController.popBackStack() })
         }
-        composable("comunicacao_familiar") {
-            ComunicacaoFamiliarScreen()
+        //rota para a tela de cuidados
+        composable("cuidados") {
+            CuidadosScreen(onNavigateToGuardia = { navController.navigate("guardia") })
         }
+
+
+
+        composable("comunicacao_familiar") {
+            ComunicacaoFamiliarScreen(navController)
+        }
+
 
     }
 }
