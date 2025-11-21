@@ -129,5 +129,9 @@ fun AppNavGraph(navController: NavHostController) {
         composable("saved") {
             SalvosScreen(onBackClick = { navController.popBackStack() })
         }
+        composable("comunicacao_familiar") {
+            ComunicacaoFamiliarScreen()
+        }
+
     }
 }
