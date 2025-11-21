@@ -243,7 +243,17 @@ fun GuardiaTipsScreen(
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
-                        .fillMaxHeight(0.95f),
+                        .fillMaxHeight(0.95f)
+                        // 👇 Só o card de Comunicação Familiar (id == 2) será clicável
+                        .then(
+                            if (tip.id == 2) {
+                                Modifier.clickable {
+                                    navController.navigate("comunicacao_familiar")
+                                }
+                            } else {
+                                Modifier
+                            }
+                        ),
                     shape = RoundedCornerShape(32.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
@@ -391,7 +401,6 @@ fun GuardiaTipsScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // ✅ Bottom bar
-            // ✅ Bottom bar
             GuardiaBottomBar(
                 currentRoute = "tips",
                 onItemClick = { route ->
@@ -406,7 +415,6 @@ fun GuardiaTipsScreen(
                     }
                 }
             )
-
         }
 
         if (showFaqDialog) {
