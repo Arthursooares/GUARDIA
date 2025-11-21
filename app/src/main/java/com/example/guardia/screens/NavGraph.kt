@@ -139,8 +139,9 @@ fun AppNavGraph(navController: NavHostController) {
 
 
         composable("comunicacao_familiar") {
-            ComunicacaoFamiliarScreen()
+            ComunicacaoFamiliarScreen(navController)
         }
+
 
     }
 }

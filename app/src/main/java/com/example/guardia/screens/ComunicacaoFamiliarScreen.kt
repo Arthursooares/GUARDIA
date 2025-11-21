@@ -2,6 +2,7 @@ package com.example.guardia.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -23,10 +24,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.guardia.R
 
 @Composable
-fun ComunicacaoFamiliarScreen() {
+fun ComunicacaoFamiliarScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -182,16 +185,23 @@ fun ComunicacaoFamiliarScreen() {
             }
         }
 
-        // ===== NOVA SEÇÃO: DESAFIOS E VISÃO DA PROTEÇÃO =====
+        // ===== SEÇÃO: DESAFIOS E VISÃO DA PROTEÇÃO =====
         Spacer(modifier = Modifier.height(24.dp))
-
         DesafiosVisaoProtecaoSection()
+
+        // ===== SEÇÃO: CINCO DICAS ESSENCIAIS =====
+        Spacer(modifier = Modifier.height(24.dp))
+        CincoDicasEssenciaisSection()
+
+        // ===== SEÇÃO FINAL: MONITORAMENTO + BOTÃO PRO CHAT =====
+        Spacer(modifier = Modifier.height(24.dp))
+        MonitoramentoFerramentasSection(navController)
 
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
-// ========== SEÇÃO NOVA ==========
+// ========== SEÇÃO: DESAFIOS E VISÃO DA PROTEÇÃO ==========
 @Composable
 private fun DesafiosVisaoProtecaoSection() {
 
@@ -214,16 +224,14 @@ private fun DesafiosVisaoProtecaoSection() {
 
     Spacer(modifier = Modifier.height(14.dp))
 
-    // ========================
-    // CARD 1 - INTERNET NÃO É A VILÃ
-    // ========================
+    // CARD 1
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 6.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFEAAA) // COR CORRETA DO PRINT
+            containerColor = Color(0xFFFFEAAA)
         )
     ) {
         Column(
@@ -250,16 +258,14 @@ private fun DesafiosVisaoProtecaoSection() {
         }
     }
 
-    // ========================
-    // CARD 2 - A IMPORTÂNCIA DO DIÁLOGO
-    // ========================
+    // CARD 2
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 6.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFEAAA) // COR CORRETA DO PRINT
+            containerColor = Color(0xFFFFEAAA)
         )
     ) {
         Column(
@@ -286,16 +292,14 @@ private fun DesafiosVisaoProtecaoSection() {
         }
     }
 
-    // ========================
-    // CARD 3 - NÃO CONFIAR NA SEGURANÇA ABSOLUTA
-    // ========================
+    // CARD 3
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 6.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFEAAA) // COR CORRETA DO PRINT
+            containerColor = Color(0xFFFFEAAA)
         )
     ) {
         Column(
@@ -323,7 +327,227 @@ private fun DesafiosVisaoProtecaoSection() {
     }
 }
 
+// ========== SEÇÃO: CINCO DICAS ESSENCIAIS ==========
+@Composable
+private fun CincoDicasEssenciaisSection() {
 
+    // Faixa de título
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFFFC94D))
+            .padding(vertical = 10.dp)
+    ) {
+        Text(
+            text = "Cinco Dicas Essenciais para Conversar",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF23408F),
+            modifier = Modifier.align(Alignment.Center),
+            textAlign = TextAlign.Center
+        )
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    // Fundo amarelo da área dos cards
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFFFD96A))
+            .padding(vertical = 18.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            // Linha 1: dois cards
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                DicaPillCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Cuidado com\nPredadores",
+                    text = "Use exemplos ou histórias adequadas para explicar que existem adultos mal-intencionados que podem tentar enganar crianças online."
+                )
+                DicaPillCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Cuidado ao\nCompartilhar",
+                    text = "Explique que o conteúdo digital pode ser permanente e que fotos, mensagens e dados pessoais não devem ser compartilhados sem cuidado."
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Linha 2: dois cards
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                DicaPillCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Alerta sobre\nEncontros",
+                    text = "Deixe claro que nunca se deve encontrar pessoalmente alguém conhecido apenas pela internet, sem a presença e autorização de um responsável."
+                )
+                DicaPillCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Restrição a Sites\nInapropriados",
+                    text = "Converse sobre conteúdos inapropriados para a idade e combine regras claras sobre o que pode ou não ser acessado."
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Linha 3: card único centralizado
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                DicaPillCard(
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                    title = "Prevenção ao Bullying",
+                    text = "Aborde o assunto com calma, mostrando que a criança pode pedir ajuda se sofrer ou presenciar situações de humilhação, ofensas ou exclusão online."
+                )
+            }
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            Text(
+                text = "Ações de Monitoramento e Ferramentas",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF23408F),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun DicaPillCard(
+    title: String,
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFDF5EC)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 14.dp, horizontal = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFB4322E),
+                textAlign = TextAlign.Center,
+                lineHeight = 18.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = text,
+                fontSize = 13.sp,
+                color = Color(0xFF333333),
+                textAlign = TextAlign.Justify,
+                lineHeight = 18.sp
+            )
+        }
+    }
+}
+
+// ========== SEÇÃO FINAL: MONITORAMENTO + BOTÃO ==========
+@Composable
+fun MonitoramentoFerramentasSection(navController: NavController) {
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFFFD96A)) // amarelo igual ao protótipo
+            .padding(vertical = 20.dp)
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+
+            // ===== LISTA DE BULLETS =====
+            BulletItem(
+                "Monitoramento Ativo e Positivo: Não se trata de espionagem, mas de presença. Os dispositivos (computadores, tablets) devem estar em áreas comuns da casa (sala), permitindo a supervisão visual."
+            )
+
+            BulletItem(
+                "Estar Atualizado e Interessado: Os pais devem se informar sobre os aplicativos, jogos e desafios que estão na moda."
+            )
+
+            BulletItem(
+                "Monitore por Idade: Crianças pequenas requerem controle centralizado e maior restrição. Adolescentes devem ter mais privacidade, mas os pais precisam saber com quem eles se relacionam e quais conteúdos acessam."
+            )
+
+            BulletItem(
+                "Filtros de Segurança: Instale e configure filtros de conteúdo nos navegadores (como o Safe Search do Google Chrome), limitar tempo de uso e evitar a exposição a conteúdos inadequados."
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // ===== BLOCO FINAL: PERGUNTA + BOTÃO =====
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                // "Ainda com dúvidas?"
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "Ainda com dúvidas?",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF23408F)
+                    )
+                }
+
+                // ===== BOTÃO =====
+                Card(
+                    shape = RoundedCornerShape(50),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFEFEFEF)
+                    ),
+                    modifier = Modifier
+                        .padding(start = 12.dp)
+                        .clickable {
+                            navController.navigate("guardia")
+                        }
+                ) {
+                    Text(
+                        text = "Converse com a Guardiã",
+                        modifier = Modifier.padding(
+                            horizontal = 18.dp,
+                            vertical = 10.dp
+                        ),
+                        color = Color(0xFF23408F),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        }
+    }
+}
 
 // ========== BULLET ITEM ==========
 @Composable
@@ -352,7 +576,8 @@ private fun BulletItem(text: String) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ComunicacaoFamiliarScreenPreview() {
+    val navController = rememberNavController()
     MaterialTheme {
-        ComunicacaoFamiliarScreen()
+        ComunicacaoFamiliarScreen(navController)
     }
 }
