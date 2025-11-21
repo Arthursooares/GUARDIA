@@ -76,7 +76,7 @@ fun GuardiaTipsScreen(
                     "• Não compartilhe dados pessoais com outros jogadores\n\n" +
                     "• Bloqueie e reporte comportamentos abusivos",
             imageRes = R.drawable.guardia_videogame,
-            imageScale = 2.55f,
+            imageScale = 2.1f, // AQUI: Tamanho reduzido
             imageOffsetX = 5.dp,
             imageOffsetY = 33.dp,
             imageWidthFraction = 1.3f
@@ -89,8 +89,8 @@ fun GuardiaTipsScreen(
                     "• Peça ajuda quando se sentir desconfortável\n\n" +
                     "• Mantenha um diálogo saudável e honesto",
             imageRes = R.drawable.guardia_familia,
-            imageScale = 2.55f,
-            imageOffsetX = 20.dp,      // ➜ mais pra direita
+            imageScale = 2.0f, // Tamanho
+            imageOffsetX = 20.dp,
             imageOffsetY = 30.dp,
             imageWidthFraction = 1.3f
         ),
@@ -102,7 +102,7 @@ fun GuardiaTipsScreen(
                     "• Cuidado ao aceitar solicitações de amizade de desconhecidos\n\n" +
                     "• Pense bem antes de postar fotos ou informações",
             imageRes = R.drawable.guardia_celular,
-            imageScale = 2.55f,
+            imageScale = 2.1f, // Tamanho
             imageOffsetX = 5.dp,
             imageOffsetY = 33.dp,
             imageWidthFraction = 1.3f
@@ -118,7 +118,7 @@ fun GuardiaTipsScreen(
                     "• Conversas com conteúdo sexual\n" +
                     "• Pedidos de fotos íntimas",
             imageRes = R.drawable.guardia_escudo,
-            imageScale = 2.55f,
+            imageScale = 2.0f, // Tamanho
             imageOffsetX = 10.dp,
             imageOffsetY = 34.dp,
             imageWidthFraction = 1.3f
@@ -243,7 +243,12 @@ fun GuardiaTipsScreen(
                     modifier = Modifier
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
-                        .fillMaxHeight(0.95f),
+                        .fillMaxHeight(0.95f)
+                        .clickable { // AQUI: Adicionamos o clique
+                            if (tip.id == 3) {
+                                navController.navigate("cuidados")
+                            }
+                        },
                     shape = RoundedCornerShape(32.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)

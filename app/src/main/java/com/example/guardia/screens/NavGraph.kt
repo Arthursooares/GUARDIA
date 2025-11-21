@@ -118,13 +118,17 @@ fun AppNavGraph(navController: NavHostController) {
 
         // Novas rotas
         composable("editProfile") {
-            EditScreen(onUpdateClick = { navController.popBackStack() }) // AQUI: Conectamos a navegação
+            EditScreen(onUpdateClick = { navController.popBackStack() })
         }
         composable("security") {
             SenhaScreen(onBackClick = { navController.popBackStack() })
         }
         composable("saved") {
             SalvosScreen(onBackClick = { navController.popBackStack() })
+        }
+        //rota para a tela de cuidados
+        composable("cuidados") {
+            CuidadosScreen(onNavigateToGuardia = { navController.navigate("guardia") })
         }
     }
 }
