@@ -3,6 +3,7 @@ package com.example.guardia.screens
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,14 +30,11 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -49,15 +47,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.foundation.Canvas
-import androidx.compose.ui.draw.clip
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,8 +73,9 @@ class MainActivity : ComponentActivity() {
 fun MeusRelatoriosTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = lightColorScheme(
-            primary = Color(0xFF3B7DAC),
-            background = Color(0xFFAFDFDF)
+            primary = Color(0xFF537FA8),
+            background = Color(0xFFAFDFDF),
+            surface = Color(0xFFFFFFFF)
         ),
         content = content
     )
@@ -106,7 +106,9 @@ fun MeusRelatoriosScreen() {
 
     Scaffold(
         topBar = {
-            Column {
+            Column(
+                modifier = Modifier.background(Color(0xFFAFDFDF))
+            ) {
                 TopAppBar(
                     title = {
                         Row(
@@ -116,44 +118,43 @@ fun MeusRelatoriosScreen() {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Voltar",
-                                tint = Color(0xFF1E3A5F),
+                                tint = Color(0xFF2B4A6F),
                                 modifier = Modifier
-                                    .size(28.dp)
-                                    .clickable { /* Ação de voltar */ }
+                                    .size(32.dp)
+                                    .clickable { /* Voltar */ }
                             )
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(16.dp))
                             Text(
                                 text = "Meus ",
-                                fontSize = 30.sp,
+                                fontSize = 32.sp,
                                 fontWeight = FontWeight.Normal,
-                                color = Color(0xFF1E3A5F)
+                                color = Color(0xFF2B4A6F),
+                                letterSpacing = 0.sp
                             )
                             Text(
                                 text = "Relatórios",
-                                fontSize = 30.sp,
+                                fontSize = 32.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1E3A5F)
+                                color = Color(0xFF2B4A6F),
+                                letterSpacing = 0.sp
                             )
                             Spacer(modifier = Modifier.weight(1f))
-                            ClipboardIcon()
+                            ClipboardIconDetailed()
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color(0xFFAFDFDF)
                     ),
-                    modifier = Modifier.height(72.dp)
+                    modifier = Modifier.height(80.dp)
                 )
-                // Linha divisória
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Color(0xFF90C4C4))
+                Divider(
+                    color = Color(0xFF8FCBCB),
+                    thickness = 1.dp
                 )
             }
         },
         bottomBar = {
-            BottomNavigationBar(
+            BottomNavigationBarCustom(
                 selectedTab = selectedTab,
                 onTabSelected = { selectedTab = it }
             )
@@ -164,117 +165,122 @@ fun MeusRelatoriosScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+                .padding(horizontal = 24.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(relatorios) { relatorio ->
-                RelatorioCard(relatorio)
+                RelatorioCardDetailed(relatorio)
             }
             item {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
 }
 
 @Composable
-fun ClipboardIcon() {
+fun ClipboardIconDetailed() {
     Box(
         modifier = Modifier
-            .size(56.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color(0xFF3B7DAC)),
+            .size(64.dp)
+            .shadow(4.dp, RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color(0xFF537FA8)),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(10.dp)
-        ) {
-            // Clip superior da prancheta
-            Box(
-                modifier = Modifier
-                    .width(18.dp)
-                    .height(5.dp)
-                    .clip(RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp))
-                    .background(Color.White)
+        Canvas(modifier = Modifier.size(40.dp)) {
+            val width = size.width
+            val height = size.height
+
+            // Clip superior (prendedor)
+            drawRoundRect(
+                color = Color.White,
+                topLeft = Offset(width * 0.3f, height * 0.05f),
+                size = androidx.compose.ui.geometry.Size(width * 0.4f, height * 0.12f),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(4f, 4f)
             )
-            // Corpo da prancheta com linhas
-            Box(
-                modifier = Modifier
-                    .width(30.dp)
-                    .height(32.dp)
-                    .clip(RoundedCornerShape(3.dp))
-                    .background(Color.White)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 6.dp, top = 6.dp, end = 6.dp, bottom = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(3.dp)
-                ) {
-                    // 3 linhas de checklist
-                    repeat(3) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(3.dp)
-                        ) {
-                            // Checkbox
-                            Box(
-                                modifier = Modifier
-                                    .size(4.dp)
-                                    .background(Color(0xFF3B7DAC))
-                            )
-                            // Linha
-                            Box(
-                                modifier = Modifier
-                                    .width(14.dp)
-                                    .height(2.dp)
-                                    .background(Color(0xFF3B7DAC))
-                            )
-                        }
-                    }
-                }
+
+            // Corpo da prancheta
+            drawRoundRect(
+                color = Color.White,
+                topLeft = Offset(width * 0.15f, height * 0.15f),
+                size = androidx.compose.ui.geometry.Size(width * 0.7f, height * 0.75f),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(6f, 6f)
+            )
+
+            // Linhas de checklist (3 linhas)
+            val lineStartX = width * 0.25f
+            val lineEndX = width * 0.75f
+            val checkboxSize = 8f
+
+            for (i in 0..2) {
+                val lineY = height * (0.3f + i * 0.18f)
+
+                // Checkbox (check mark)
+                drawLine(
+                    color = Color(0xFF537FA8),
+                    start = Offset(lineStartX, lineY),
+                    end = Offset(lineStartX + checkboxSize * 0.4f, lineY + checkboxSize * 0.4f),
+                    strokeWidth = 3f,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = Color(0xFF537FA8),
+                    start = Offset(lineStartX + checkboxSize * 0.4f, lineY + checkboxSize * 0.4f),
+                    end = Offset(lineStartX + checkboxSize, lineY - checkboxSize * 0.2f),
+                    strokeWidth = 3f,
+                    cap = StrokeCap.Round
+                )
+
+                // Linha de texto
+                drawLine(
+                    color = Color(0xFF537FA8),
+                    start = Offset(lineStartX + checkboxSize + 8f, lineY),
+                    end = Offset(lineEndX, lineY),
+                    strokeWidth = 3f,
+                    cap = StrokeCap.Round
+                )
             }
         }
     }
 }
 
 @Composable
-fun RelatorioCard(relatorio: Relatorio) {
+fun RelatorioCardDetailed(relatorio: Relatorio) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(85.dp)
-            .clickable { /* Ação ao clicar */ },
-        shape = RoundedCornerShape(20.dp),
+            .height(90.dp)
+            .clickable { /* Abrir relatório */ },
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFD1ECEC)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 28.dp, vertical = 18.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             Column(
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
                     text = "${relatorio.titulo} - ${relatorio.data}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color(0xFF1E3A5F),
-                    letterSpacing = 0.sp
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF2B4A6F),
+                    letterSpacing = 0.2.sp
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = relatorio.tamanho,
-                    fontSize = 14.sp,
-                    color = Color(0xFF6B7D8B),
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Normal,
+                    color = Color(0xFF6B8299),
                     letterSpacing = 0.sp
                 )
             }
@@ -283,41 +289,52 @@ fun RelatorioCard(relatorio: Relatorio) {
 }
 
 @Composable
-fun BottomNavigationBar(
+fun BottomNavigationBarCustom(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit
 ) {
-    Surface(
-        color = Color(0xFFE8F5F5),
-        modifier = Modifier.height(70.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(75.dp)
     ) {
+        // Barra de navegação com elevação
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .shadow(12.dp, RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp))
+                .background(Color(0xFFE8F5F5))
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+                .align(Alignment.Center)
+                .padding(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Perfil
-            BottomNavItem(
+            BottomNavIconItem(
                 icon = Icons.Default.Person,
                 selected = selectedTab == 0,
                 onClick = { onTabSelected(0) }
             )
 
             // Mensagens
-            BottomNavItem(
+            BottomNavIconItem(
                 icon = Icons.Default.ChatBubbleOutline,
                 selected = selectedTab == 1,
                 onClick = { onTabSelected(1) }
             )
 
-            // Home (com círculo azul)
+            // Home - Botão destacado
             Box(
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(62.dp)
+                    .shadow(8.dp, CircleShape)
                     .clip(CircleShape)
-                    .background(Color(0xFF3B7DAC))
+                    .background(Color(0xFF537FA8))
                     .clickable { onTabSelected(2) },
                 contentAlignment = Alignment.Center
             ) {
@@ -325,19 +342,19 @@ fun BottomNavigationBar(
                     imageVector = Icons.Default.Home,
                     contentDescription = "Home",
                     tint = Color.White,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(32.dp)
                 )
             }
 
             // Comunidade
-            BottomNavItem(
+            BottomNavIconItem(
                 icon = Icons.Default.Person,
                 selected = selectedTab == 3,
                 onClick = { onTabSelected(3) }
             )
 
             // Configurações
-            BottomNavItem(
+            BottomNavIconItem(
                 icon = Icons.Default.Settings,
                 selected = selectedTab == 4,
                 onClick = { onTabSelected(4) }
@@ -347,22 +364,22 @@ fun BottomNavigationBar(
 }
 
 @Composable
-fun BottomNavItem(
+fun BottomNavIconItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     selected: Boolean,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
-            .size(48.dp)
+            .size(52.dp)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color(0xFF3B7DAC),
-            modifier = Modifier.size(28.dp)
+            tint = Color(0xFF537FA8),
+            modifier = Modifier.size(30.dp)
         )
     }
 }
