@@ -1,6 +1,5 @@
 package com.example.guardia.screens
 
-import android.app.Activity // 👈 ADIÇÃO para voltar
 import android.content.Intent
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.Image
@@ -12,39 +11,37 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext // ADIÇÃO para pegar a Activity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
-import org.json.JSONObject
+import com.example.guardia.R
 import com.example.guardia.network.ChatApi
 import com.example.guardia.network.ChatRequest
 import com.example.guardia.network.provideChatApi
-import com.example.guardia.R
-import androidx.compose.material.icons.automirrored.filled.ArrowBack // ADIÇÃO seta auto espelhada
+import kotlinx.coroutines.launch
+import org.json.JSONObject
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.ui.draw.rotate
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.ui.graphics.graphicsLayer
-
-
+import androidx.compose.animation.core.LinearEasing
 
 // quem fala
 enum class Role { USER, ASSISTANT }
@@ -55,13 +52,11 @@ data class MessageUi(
     val text: String
 )
 
-// 👇 ADIÇÃO: bolha de "digitando..."
+// bolha de "digitando..."
 @Composable
 private fun TypingBubble() {
-    // animação infinita de rotação e brilho
     val infiniteTransition = rememberInfiniteTransition(label = "starAnimation")
 
-    // rotação contínua
     val angle by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
@@ -71,7 +66,6 @@ private fun TypingBubble() {
         label = "rotation"
     )
 
-    // brilho pulsante (mudança de alpha)
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.9f,
         targetValue = 1f,
@@ -97,7 +91,6 @@ private fun TypingBubble() {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
-
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = "Estrela animada",
@@ -105,7 +98,7 @@ private fun TypingBubble() {
                         .size(20.dp)
                         .rotate(angle)
                         .graphicsLayer { this.alpha = alpha },
-                    tint = Color(0xFFFFD700) // 💛 Amarelo dourado
+                    tint = Color(0xFFFFD700)
                 )
 
                 Spacer(Modifier.width(6.dp))
@@ -119,32 +112,28 @@ private fun TypingBubble() {
     }
 }
 
-
-
-// bolha da guardiã (esquerda, com avatar circular maior e espaço reservado)
+// bolha da guardiã (esquerda)
 @Composable
 private fun AssistantMessage(msg: MessageUi) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            // reserva espaço do lado direito da tela
             .padding(start = 10.dp, end = 70.dp, top = 6.dp, bottom = 6.dp),
         verticalAlignment = Alignment.Top
     ) {
-        // avatar maior
         Box(
             modifier = Modifier
                 .size(64.dp)
-                .clip(CircleShape), // corta a imagem em círculo
+                .clip(CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.guardia4),
                 contentDescription = "Guardiã",
                 modifier = Modifier
-                    .fillMaxSize() // preenche o círculo
-                    .clip(CircleShape), // garante que o corte se aplique à imagem
-                contentScale = ContentScale.Crop // corta sem distorcer
+                    .fillMaxSize()
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
             )
         }
 
@@ -165,13 +154,12 @@ private fun AssistantMessage(msg: MessageUi) {
     }
 }
 
-// bolha do usuário (direita, com avatar circular maior e espaço reservado)
+// bolha do usuário (direita)
 @Composable
 private fun UserMessage(msg: MessageUi) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            // reserva espaço do lado esquerdo agora
             .padding(start = 70.dp, end = 10.dp, top = 6.dp, bottom = 6.dp),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.Bottom
@@ -193,16 +181,16 @@ private fun UserMessage(msg: MessageUi) {
 
         Box(
             modifier = Modifier
-                .size(64.dp) // 🔹 tamanho total do círculo
+                .size(64.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF21A189)), // cor da borda de fundo
+                .background(Color(0xFF21A189)),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.livia),
-                contentDescription = "Guardiã",
+                contentDescription = "Usuária",
                 modifier = Modifier
-                    .fillMaxSize(1.0F) // 🔹 tamanho da imagem dentro do círculo
+                    .fillMaxSize(1.0f)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
@@ -229,12 +217,12 @@ fun GuardiaScreen() {
     var userMessage by remember { mutableStateOf("") }
     var isTyping by remember { mutableStateOf(false) }
 
-    // denúncia (mantive, mas não mostramos no protótipo por enquanto)
     var lastSeverity by remember { mutableStateOf<Int?>(null) }
     var lastReport by remember { mutableStateOf<String?>(null) }
 
-    val context = LocalContext.current // 👈 ADIÇÃO
+    val context = LocalContext.current
 
+    // mensagem de boas-vindas UMA VEZ, quando abrir o chat
     LaunchedEffect(Unit) {
         if (messages.isEmpty()) {
             messages += MessageUi(
@@ -254,7 +242,6 @@ fun GuardiaScreen() {
 
     Scaffold(
         topBar = {
-            // topo no estilo do protótipo
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -274,11 +261,11 @@ fun GuardiaScreen() {
                         .padding(horizontal = 4.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    // 👇 ADIÇÃO: seta de voltar
                     IconButton(
                         onClick = {
-                            (context as? androidx.activity.ComponentActivity)?.onBackPressedDispatcher?.onBackPressed()
-
+                            (context as? androidx.activity.ComponentActivity)
+                                ?.onBackPressedDispatcher
+                                ?.onBackPressed()
                         },
                         modifier = Modifier.align(Alignment.CenterStart)
                     ) {
@@ -289,7 +276,6 @@ fun GuardiaScreen() {
                         )
                     }
 
-                    // logo
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_guardia_escudo),
@@ -300,7 +286,7 @@ fun GuardiaScreen() {
                 }
 
                 Spacer(Modifier.height(12.dp))
-                // linha branca que o protótipo tem
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -331,7 +317,6 @@ fun GuardiaScreen() {
                     .fillMaxSize()
                     .padding(horizontal = 6.dp, vertical = 4.dp)
             ) {
-                // lista de mensagens
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
@@ -343,14 +328,14 @@ fun GuardiaScreen() {
                         ChatBubble(msg)
                     }
 
-                    // 👇 ADIÇÃO: mostrar "digitando..." quando isTyping = true
                     if (isTyping) {
                         item {
                             TypingBubble()
                         }
                     }
 
-                    if ((lastSeverity ?: 0) >= 2 && !lastReport.isNullOrBlank()) {
+                    // botão para compartilhar relatório sempre que tiver lastReport
+                    if (lastReport != null && lastReport!!.isNotBlank()) {
                         item {
                             TextButton(
                                 onClick = {
@@ -358,19 +343,23 @@ fun GuardiaScreen() {
                                         type = "text/plain"
                                         putExtra(Intent.EXTRA_TEXT, lastReport)
                                     }
-                                    // chooser
+                                    context.startActivity(
+                                        Intent.createChooser(
+                                            send,
+                                            "Compartilhar relatório"
+                                        )
+                                    )
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp)
                             ) {
-                                Text("📄 Compartilhar denúncia", color = Color.White)
+                                Text("📄 Compartilhar relatório", color = Color.White)
                             }
                         }
                     }
                 }
 
-                // barra de input igual ao protótipo
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -379,9 +368,7 @@ fun GuardiaScreen() {
                         .background(Color(0xFFEFF2F4)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = {
-                        // futuro: anexar, abrir opções, etc.
-                    }) {
+                    IconButton(onClick = { /* futuro: anexar */ }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Mais",
@@ -411,6 +398,7 @@ fun GuardiaScreen() {
 
                             val original = userMessage.trim()
 
+                            // adiciona mensagem do usuário
                             messages += MessageUi(
                                 id = System.currentTimeMillis().toString() + "_u",
                                 role = Role.USER,
@@ -421,26 +409,70 @@ fun GuardiaScreen() {
                             lastReport = null
                             lastSeverity = null
 
-                            // chamada da API
                             scope.launch {
                                 try {
                                     val res = chatApi.send(ChatRequest(original))
+
                                     if (res.isSuccessful) {
                                         val raw = res.body()?.string()
-                                        val text = try {
-                                            val json = JSONObject(raw ?: "")
-                                            json.optString("message", raw ?: "")
+
+                                        val (replyText, severity, reportText) = try {
+                                            val json = JSONObject(raw ?: "{}")
+
+                                            // texto principal
+                                            val reply = json.optString(
+                                                "reply",
+                                                "Não consegui entender a resposta da Guardiã."
+                                            )
+
+                                            // bloco de risco
+                                            val risk = json.optJSONObject("risk")
+                                            val nivel = risk?.optString("nivel") ?: "Moderado"
+                                            val orientacao = risk?.optString("orientacao") ?: ""
+                                            val encaminhamento = risk?.optString("encaminhamento") ?: ""
+
+                                            // bloco de contexto
+                                            val contextoJson = json.optJSONObject("contexto")
+                                            val resumo = contextoJson?.optString("resumoSituacao") ?: ""
+                                            val categoria = contextoJson?.optString("categoria") ?: ""
+
+                                            // 1=Moderado, 2=Alerta, 3=Urgente
+                                            val severityInt = when (nivel.lowercase()) {
+                                                "alerta" -> 2
+                                                "urgente" -> 3
+                                                else -> 1
+                                            }
+
+                                            // texto do relatório
+                                            val report = buildString {
+                                                appendLine("Resumo da situação: $resumo")
+                                                appendLine("Categoria: $categoria")
+                                                appendLine("Nível de risco: $nivel")
+                                                if (orientacao.isNotBlank()) appendLine("Orientação: $orientacao")
+                                                if (encaminhamento.isNotBlank()) appendLine("Encaminhamento: $encaminhamento")
+                                            }.trim()
+
+                                            Triple(
+                                                reply.replace("\n", " ").trim(),
+                                                severityInt,
+                                                report
+                                            )
                                         } catch (e: Exception) {
-                                            raw
+                                            Triple(
+                                                raw?.replace("\n", " ")?.trim()
+                                                    ?: "Não consegui processar a resposta.",
+                                                1,
+                                                ""
+                                            )
                                         }
-                                            ?.replace("\\n", "\n")
-                                            ?.trim()
+
+                                        lastSeverity = severity
+                                        lastReport = reportText.takeIf { it.isNotBlank() }
 
                                         messages += MessageUi(
                                             id = System.currentTimeMillis().toString() + "_a",
                                             role = Role.ASSISTANT,
-                                            text = text.takeUnless { it.isNullOrBlank() }
-                                                ?: "Servidor respondeu vazio (200)."
+                                            text = replyText
                                         )
                                     } else {
                                         val err = res.errorBody()?.string()
@@ -457,7 +489,7 @@ fun GuardiaScreen() {
                                         text = "Falha de rede no app: ${e.message ?: "desconhecida"}"
                                     )
                                 } finally {
-                                    isTyping = false // 👈 garante que some o "digitando..."
+                                    isTyping = false
                                 }
                             }
                         }
