@@ -157,11 +157,10 @@ fun MeusRelatoriosScreen(
             }
         },
         bottomBar = {
-            BottomNavigationBarCustom(
-                selectedTab = selectedTab,
-                onTabSelected = {
-                    selectedTab = it
-                    if (it == 2) onHomeClick()
+            GuardiaBottomBar(
+                currentRoute = "home",
+                onItemClick = {
+                    onHomeClick()
                 }
             )
         },
@@ -525,7 +524,7 @@ private fun criarPdfDoRelatorio(
     drawWrapped("")
 
 
-    // Finaliza a última página
+
     pdfDocument.finishPage(page)
 
     val dir = File(context.getExternalFilesDir("reports"), "")
