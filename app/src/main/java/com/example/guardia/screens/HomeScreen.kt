@@ -105,6 +105,7 @@ private fun TipsCard(
     imageSize: Dp = 70.dp,
     imageScale: Float = 1.0f,
     imagePadding: Dp = 0.dp,
+    imageOffsetX: Dp =  (-2).dp,
     imageOffsetY: Dp = 0.dp,
     cardHeight: Dp = 84.dp,
     textStartPadding: Dp = 110.dp
@@ -115,6 +116,7 @@ private fun TipsCard(
         onClick = onClick,
         imageSize = imageSize,
         imageScale = imageScale,
+        imageOffsetX = imageOffsetX,
         imagePadding = imagePadding,
         imageOffsetY = imageOffsetY,
         cardHeight = cardHeight,
