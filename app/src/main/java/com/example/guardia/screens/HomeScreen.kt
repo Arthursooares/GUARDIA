@@ -312,11 +312,12 @@ fun HomeScreen(
             Spacer(Modifier.height(14.dp))
 
             // 🔹 Meus Relatórios — sem rota por enquanto (evita crash)
+// 🔹 Meus Relatórios — agora navega para a tela de relatórios
             ImageCard(
                 title = "Meus Relatórios",
                 imageRes = R.drawable.ic_relatorios,
                 onClick = {
-                    // TODO: implementar tela de relatórios no futuro
+                    navController.navigate("relatorios")
                 },
                 imageSize = 70.dp,
                 imageScale = 1.0f,
@@ -329,9 +330,10 @@ fun HomeScreen(
                 title = "Upgrade Guardiã",
                 imageRes = R.drawable.estrela,
                 onClick = {
-                    navController.navigate("upgrade")
+                    navController.navigate("relatorios")
                 },
-                imageSize = 74.dp,
+
+                        imageSize = 74.dp,
                 imageScale = 1.6f,
                 imageOffsetX = (-3).dp,
                 imageOffsetY = (-1).dp
