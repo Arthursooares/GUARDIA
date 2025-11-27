@@ -1,7 +1,18 @@
 package com.example.guardia.screens
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
+import android.text.Layout
+import android.text.StaticLayout
+import android.text.TextPaint
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -31,17 +42,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import com.example.guardia.R
+import com.example.guardia.data.relatorios.RelatorioDatabase
+import com.example.guardia.data.relatorios.RelatorioEntity
+import com.example.guardia.data.relatorios.RelatorioRepository
 import com.example.guardia.network.ChatApi
 import com.example.guardia.network.ChatRequest
 import com.example.guardia.network.provideChatApi
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.LinearEasing
+import java.io.File
+import java.io.FileOutputStream
 
 // quem fala
 enum class Role { USER, ASSISTANT }
@@ -52,7 +64,7 @@ data class MessageUi(
     val text: String
 )
 
-// bolha de "digitando..."
+// 👇 bolha de "digitando..."
 @Composable
 private fun TypingBubble() {
     val infiniteTransition = rememberInfiniteTransition(label = "starAnimation")
@@ -121,6 +133,7 @@ private fun AssistantMessage(msg: MessageUi) {
             .padding(start = 10.dp, end = 70.dp, top = 6.dp, bottom = 6.dp),
         verticalAlignment = Alignment.Top
     ) {
+        // avatar maior
         Box(
             modifier = Modifier
                 .size(64.dp)
@@ -222,7 +235,16 @@ fun GuardiaScreen() {
 
     val context = LocalContext.current
 
-    // mensagem de boas-vindas UMA VEZ, quando abrir o chat
+// DB e repositório com tipos bem claros
+    val db: RelatorioDatabase = remember(context) {
+        RelatorioDatabase.getInstance(context)
+    }
+    val relatorioRepo: RelatorioRepository = remember(db) {
+        RelatorioRepository(db.relatorioDao())
+    }
+
+
+    // mensagem de boas-vindas UMA VEZ
     LaunchedEffect(Unit) {
         if (messages.isEmpty()) {
             messages += MessageUi(
@@ -317,6 +339,7 @@ fun GuardiaScreen() {
                     .fillMaxSize()
                     .padding(horizontal = 6.dp, vertical = 4.dp)
             ) {
+                // lista de mensagens
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
@@ -324,7 +347,10 @@ fun GuardiaScreen() {
                     state = listState,
                     contentPadding = PaddingValues(top = 6.dp, bottom = 6.dp)
                 ) {
-                    items(messages, key = { it.id }) { msg ->
+                    items(
+                        items = messages,
+                        key = { item: MessageUi -> item.id }
+                    ) { msg: MessageUi ->
                         ChatBubble(msg)
                     }
 
@@ -334,32 +360,45 @@ fun GuardiaScreen() {
                         }
                     }
 
-                    // botão para compartilhar relatório sempre que tiver lastReport
                     if (lastReport != null && lastReport!!.isNotBlank()) {
                         item {
                             TextButton(
                                 onClick = {
-                                    val send = Intent(Intent.ACTION_SEND).apply {
-                                        type = "text/plain"
-                                        putExtra(Intent.EXTRA_TEXT, lastReport)
-                                    }
-                                    context.startActivity(
-                                        Intent.createChooser(
-                                            send,
-                                            "Compartilhar relatório"
+                                    try {
+                                        val pdfFile = generatePdfReport(context, lastReport!!)
+                                        val uri = FileProvider.getUriForFile(
+                                            context,
+                                            "${context.packageName}.provider",
+                                            pdfFile
                                         )
-                                    )
+
+                                        val send = Intent(Intent.ACTION_SEND).apply {
+                                            type = "application/pdf"
+                                            putExtra(Intent.EXTRA_STREAM, uri)
+                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        }
+
+                                        context.startActivity(
+                                            Intent.createChooser(
+                                                send,
+                                                "Compartilhar relatório em PDF"
+                                            )
+                                        )
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp)
                             ) {
-                                Text("📄 Compartilhar relatório", color = Color.White)
+                                Text("📄 Compartilhar relatório em PDF", color = Color.White)
                             }
                         }
                     }
                 }
 
+                // barra de input
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -398,7 +437,6 @@ fun GuardiaScreen() {
 
                             val original = userMessage.trim()
 
-                            // adiciona mensagem do usuário
                             messages += MessageUi(
                                 id = System.currentTimeMillis().toString() + "_u",
                                 role = Role.USER,
@@ -419,38 +457,70 @@ fun GuardiaScreen() {
                                         val (replyText, severity, reportText) = try {
                                             val json = JSONObject(raw ?: "{}")
 
-                                            // texto principal
                                             val reply = json.optString(
                                                 "reply",
                                                 "Não consegui entender a resposta da Guardiã."
                                             )
 
-                                            // bloco de risco
+                                            // detectar se é só saudação simples
+                                            val userText = original.lowercase()
+                                            val words = userText.split("\\s+".toRegex())
+                                                .filter { it.isNotBlank() }
+                                            val greetings = listOf(
+                                                "oi", "olá", "ola", "bom dia",
+                                                "boa tarde", "boa noite", "e aí", "eaí",
+                                                "tudo bem"
+                                            )
+                                            val isGreetingOnly =
+                                                words.size <= 5 && greetings.any { g: String -> g in userText }
+
                                             val risk = json.optJSONObject("risk")
                                             val nivel = risk?.optString("nivel") ?: "Moderado"
                                             val orientacao = risk?.optString("orientacao") ?: ""
-                                            val encaminhamento = risk?.optString("encaminhamento") ?: ""
+                                            val encaminhamento =
+                                                risk?.optString("encaminhamento") ?: ""
 
-                                            // bloco de contexto
                                             val contextoJson = json.optJSONObject("contexto")
-                                            val resumo = contextoJson?.optString("resumoSituacao") ?: ""
+                                            val resumo =
+                                                contextoJson?.optString("resumoSituacao") ?: ""
                                             val categoria = contextoJson?.optString("categoria") ?: ""
 
-                                            // 1=Moderado, 2=Alerta, 3=Urgente
-                                            val severityInt = when (nivel.lowercase()) {
-                                                "alerta" -> 2
-                                                "urgente" -> 3
-                                                else -> 1
-                                            }
+                                            val severityInt: Int
+                                            val report: String
 
-                                            // texto do relatório
-                                            val report = buildString {
-                                                appendLine("Resumo da situação: $resumo")
-                                                appendLine("Categoria: $categoria")
-                                                appendLine("Nível de risco: $nivel")
-                                                if (orientacao.isNotBlank()) appendLine("Orientação: $orientacao")
-                                                if (encaminhamento.isNotBlank()) appendLine("Encaminhamento: $encaminhamento")
-                                            }.trim()
+                                            if (isGreetingOnly) {
+                                                // só saudação → sem relatório
+                                                severityInt = 0
+                                                report = ""
+                                            } else {
+                                                severityInt = when (nivel.lowercase()) {
+                                                    "alerta" -> 2
+                                                    "urgente" -> 3
+                                                    else -> 1
+                                                }
+
+                                                report = buildString {
+                                                    appendLine("Resumo da situação: $resumo")
+                                                    appendLine("Categoria: $categoria")
+                                                    appendLine("Nível de risco: $nivel")
+                                                    if (orientacao.isNotBlank()) appendLine("Orientação: $orientacao")
+                                                    if (encaminhamento.isNotBlank()) appendLine("Encaminhamento: $encaminhamento")
+                                                }.trim()
+
+                                                // salva no banco se teve relatório
+                                                if (report.isNotBlank()) {
+                                                    relatorioRepo.salvar(
+                                                        RelatorioEntity(
+                                                            resumo = if (resumo.isNotBlank()) resumo else original,
+                                                            categoria = categoria.ifBlank { "nao_informada" },
+                                                            risco = nivel,
+                                                            orientacao = orientacao,
+                                                            encaminhamento = encaminhamento,
+                                                            textoCompleto = report
+                                                        )
+                                                    )
+                                                }
+                                            }
 
                                             Triple(
                                                 reply.replace("\n", " ").trim(),
@@ -461,7 +531,7 @@ fun GuardiaScreen() {
                                             Triple(
                                                 raw?.replace("\n", " ")?.trim()
                                                     ?: "Não consegui processar a resposta.",
-                                                1,
+                                                0,
                                                 ""
                                             )
                                         }
@@ -512,6 +582,53 @@ fun GuardiaScreen() {
             }
         }
     }
+}
+
+// Geração de PDF com o texto do relatório
+fun generatePdfReport(context: Context, reportText: String): File {
+    val pageWidth = 595
+    val pageHeight = 842
+
+    val pdfDocument = PdfDocument()
+    val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
+    val page = pdfDocument.startPage(pageInfo)
+    val canvas = page.canvas
+
+    val paint = Paint()
+    paint.isAntiAlias = true
+
+    val textPaint = TextPaint(paint).apply {
+        textSize = 12f
+    }
+
+    val leftMargin = 40f
+    val topMargin = 60f
+    val usableWidth = pageWidth - (leftMargin * 2).toInt()
+
+    val staticLayout = StaticLayout.Builder
+        .obtain(reportText, 0, reportText.length, textPaint, usableWidth)
+        .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+        .setLineSpacing(0f, 1f)
+        .setIncludePad(false)
+        .build()
+
+    canvas.save()
+    canvas.translate(leftMargin, topMargin)
+    staticLayout.draw(canvas)
+    canvas.restore()
+
+    pdfDocument.finishPage(page)
+
+    val dir = File(context.getExternalFilesDir(null), "relatorios_guardia")
+    if (!dir.exists()) dir.mkdirs()
+
+    val file = File(dir, "relatorio_guardia_${System.currentTimeMillis()}.pdf")
+    FileOutputStream(file).use { out ->
+        pdfDocument.writeTo(out)
+    }
+
+    pdfDocument.close()
+    return file
 }
 
 @Preview(showBackground = true)

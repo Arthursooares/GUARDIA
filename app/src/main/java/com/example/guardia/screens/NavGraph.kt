@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
+
 @Composable
 fun AppNavGraph(navController: NavHostController) {
     NavHost(
@@ -140,6 +141,20 @@ fun AppNavGraph(navController: NavHostController) {
 
         composable("comunicacao_familiar") {
             ComunicacaoFamiliarScreen(navController)
+        }
+
+        composable("relatorios") {
+            MeusRelatoriosScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onHomeClick = {
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
 
 
