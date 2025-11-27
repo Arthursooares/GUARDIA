@@ -235,7 +235,8 @@ fun PerfilScreenPreview() {
             onNavigateToEdit = {},
             onNavigateToPlans = {},
             onNavigateToSecurity = {},
-            onNavigateToSaved = {}
+            onNavigateToSaved = {},
+            onItemClick = {}
         )
     }
 }

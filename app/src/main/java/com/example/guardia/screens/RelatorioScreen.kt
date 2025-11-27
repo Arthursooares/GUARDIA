@@ -16,26 +16,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Group
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -64,6 +56,10 @@ import java.util.Date
 import java.util.Locale
 import android.graphics.pdf.PdfDocument
 import android.graphics.Paint
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.LaunchedEffect
 
@@ -136,12 +132,14 @@ fun MeusRelatoriosScreen(
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.Normal,
                                 color = Color(0xFF2B4A6F),
+                                letterSpacing = 0.sp
                             )
                             Text(
                                 text = "Relatórios",
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF2B4A6F),
+                                letterSpacing = 0.sp
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             ClipboardIconDetailed()
@@ -159,11 +157,10 @@ fun MeusRelatoriosScreen(
             }
         },
         bottomBar = {
-            BottomNavigationBarCustom(
-                selectedTab = selectedTab,
-                onTabSelected = {
-                    selectedTab = it
-                    if (it == 2) onHomeClick()
+            GuardiaBottomBar(
+                currentRoute = "home",
+                onItemClick = {
+                    onHomeClick()
                 }
             )
         },
@@ -214,7 +211,6 @@ fun ClipboardIconDetailed() {
             val width = size.width
             val height = size.height
 
-            // Clip superior (prendedor)
             drawRoundRect(
                 color = Color.White,
                 topLeft = Offset(width * 0.3f, height * 0.05f),
@@ -222,7 +218,6 @@ fun ClipboardIconDetailed() {
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(4f, 4f)
             )
 
-            // Corpo da prancheta
             drawRoundRect(
                 color = Color.White,
                 topLeft = Offset(width * 0.15f, height * 0.15f),
@@ -230,15 +225,12 @@ fun ClipboardIconDetailed() {
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(6f, 6f)
             )
 
-            // Linhas de checklist (3 linhas)
             val lineStartX = width * 0.25f
-            val lineEndX = width * 0.75f
             val checkboxSize = 8f
 
             for (i in 0..2) {
                 val lineY = height * (0.3f + i * 0.18f)
 
-                // Checkbox (check mark)
                 drawLine(
                     color = Color(0xFF537FA8),
                     start = Offset(lineStartX, lineY),
@@ -254,11 +246,10 @@ fun ClipboardIconDetailed() {
                     cap = StrokeCap.Round
                 )
 
-                // Linha de texto
                 drawLine(
                     color = Color(0xFF537FA8),
                     start = Offset(lineStartX + checkboxSize + 8f, lineY),
-                    end = Offset(lineEndX, lineY),
+                    end = Offset(lineStartX + (width * 0.4f), lineY),
                     strokeWidth = 3f,
                     cap = StrokeCap.Round
                 )
@@ -533,7 +524,7 @@ private fun criarPdfDoRelatorio(
     drawWrapped("")
 
 
-    // Finaliza a última página
+
     pdfDocument.finishPage(page)
 
     val dir = File(context.getExternalFilesDir("reports"), "")
@@ -556,4 +547,5 @@ fun PreviewRelatorios() {
         MeusRelatoriosScreen()
     }
 }
+
 

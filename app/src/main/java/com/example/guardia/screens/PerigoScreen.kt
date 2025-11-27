@@ -13,7 +13,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
@@ -29,8 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.guardia.R
 
+private val primary_bg_color = Color(0xFF8E94FF)
+private val card_bg_color = Color(0xFF565BAD)
+private val section_header_bg_color = Color(0xFF14265B)
+private val text_color_on_dark = Color.White
 private val title_color = Color(0xFF1F367C)
-private val primary_bg_color = Color(0xFF293859)
 
 @Composable
 fun PerigoScreen(onNavigateToGuardia: () -> Unit = {}) {
@@ -42,73 +47,120 @@ fun PerigoScreen(onNavigateToGuardia: () -> Unit = {}) {
     ) {
         PerigoTopAppBar()
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column {
-                SectionHeader("Riscos do Ambiente dos Jogos Online:", "A diversão também merece atenção!")
-                Spacer(modifier = Modifier.height(24.dp))
-                Column(
-                    modifier = Modifier.padding(start = 24.dp, end = 120.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    InfoText(
-                        "Os jogos online, por sua natureza interativa e muitas vezes anônima, criam um ecossistema com vulnerabilidades específicas que exigem atenção redobrada dos pais e cuidadores.",
-                        highlights = emptyList(),
-                        color = Color.White
-                    )
-                }
+        // Header com imagem e círculos decorativos
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(260.dp)
+        ) {
+            // Texto de introdução (fundo)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 80.dp, start = 24.dp, end = 24.dp)
+            ) {
+                Text(
+                    "Os jogos online, por sua natureza interativa e muitas vezes anônima, criam um ecossistema com vulnerabilidades específicas que exigem atenção redobrada dos pais e cuidadores.",
+                    color = text_color_on_dark,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
+                    modifier = Modifier.padding(start = 160.dp)
+                )
             }
+
+            // Header principal
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(section_header_bg_color)
+                    .padding(vertical = 16.dp, horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Riscos do Ambiente dos Jogos Online:",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "A diversão também merece atenção!",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            // Círculos decorativos
             Box(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = 40.dp, y = 90.dp)
-                    .size(130.dp)
-                    .background(color = Color(0xFF4CA593), shape = CircleShape)
+                    .offset(x = 15.dp, y = 120.dp)
+                    .size(110.dp)
+                    .background(color = Color(0xFF323ACE), shape = CircleShape)
             )
             Box(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = (-25).dp, y = 65.dp)
-                    .size(75.dp)
-                    .background(color = title_color, shape = CircleShape)
+                    .offset(x = 50.dp, y = 90.dp)
+                    .size(80.dp)
+                    .background(color = card_bg_color, shape = CircleShape)
             )
+            Box(
+                modifier = Modifier
+                    .offset(x = 85.dp, y = 75.dp)
+                    .size(45.dp)
+                    .background(color = Color(0xFF0A0647), shape = CircleShape)
+            )
+
+            // Imagem do personagem
             Image(
-                painter = painterResource(id = R.drawable.guardia_videogame),
-                contentDescription = null,
+                painter = painterResource(id = R.drawable.perigos),
+                contentDescription = "Personagem Guardiã",
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(230.dp)
-                    .offset(x = 70.dp, y = 10.dp),
+                    .size(290.dp)
+                    .align(Alignment.CenterStart)
+                    .offset(x = -40.dp, y = 80.dp),
                 contentScale = ContentScale.Crop
             )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        PerigoSectionCard("Perigos de Interação e Conteúdo (Contato e Conduta)")
+        // Card de título
+        TitleCard("Perigos de Interação e Conteúdo (Contato e Conduta)")
+
         Spacer(modifier = Modifier.height(16.dp))
+
         InfoText(
             "Os jogos online apresentam riscos significativos para os jovens, que vão além do cyberbullying. Os perigos se destacam por ocorrerem em ambientes fechados e imersivos, dos quais a vítima depende para se divertir, tornando a fuga mais difícil.",
-            highlights = emptyList(),
             modifier = Modifier.padding(horizontal = 24.dp),
-            color = Color.White
+            color = text_color_on_dark
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // Principais riscos - Card escuro
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF355A86))
-                .padding(vertical = 24.dp, horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .background(card_bg_color)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
                 "Principais riscos:",
-                color = Color.White,
+                color = text_color_on_dark,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
+                fontSize = 18.sp,
+                style = TextStyle(
+                    shadow = Shadow(
+                        color = Color.White.copy(alpha = 0.3f),
+                        offset = Offset(0f, 0f),
+                        blurRadius = 8f
+                    )
+                )
             )
             RiskInfoItem(
                 "Assédio e Comportamento Tóxico:",
@@ -128,12 +180,13 @@ fun PerigoScreen(onNavigateToGuardia: () -> Unit = {}) {
             )
         }
 
+        // Riscos adicionais - Fundo roxo claro
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF293859))
-                .padding(vertical = 24.dp, horizontal = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .background(primary_bg_color)
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             RiskInfoItem(
                 "Vazamento de Dados:",
@@ -151,36 +204,49 @@ fun PerigoScreen(onNavigateToGuardia: () -> Unit = {}) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        PerigoSectionCard("Benefícios (Com Moderação e Supervisão)")
+        TitleCard("Benefícios (Com Moderação e Supervisão)")
 
+        // Benefícios com divisores
         Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
             BenefitItem(
                 "Desenvolvimento Cognitivo",
                 "Jogos de estratégia (RTS) ou quebra-cabeças complexos aprimoram o raciocínio lógico, a memória de trabalho e a capacidade de tomar decisões rápidas sob pressão."
             )
-            HorizontalDivider(color = Color.White.copy(alpha = 0.3f))
+            HorizontalDivider(
+                color = Color.White.copy(alpha = 0.3f),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
             BenefitItem(
                 "Socialização e Cooperação",
                 "Jogos cooperativos exigem comunicação efetiva, trabalho em equipe, e resolução de conflitos em tempo real, habilidades sociais cruciais que são treinadas no ambiente seguro do jogo."
             )
-            HorizontalDivider(color = Color.White.copy(alpha = 0.3f))
+            HorizontalDivider(
+                color = Color.White.copy(alpha = 0.3f),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
             BenefitItem(
                 "Criatividade e Resolução de Problemas",
                 "Jogos \"sandbox\" (como Minecraft ou Roblox) incentivam a imaginação, a criação de estruturas complexas e o planejamento de longo prazo."
             )
-            HorizontalDivider(color = Color.White.copy(alpha = 0.3f))
+            HorizontalDivider(
+                color = Color.White.copy(alpha = 0.3f),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
             BenefitItem(
                 "Coordenação Motora e Reflexos",
                 "Jogos de ação ou esportivos aprimoram a coordenação óculo-manual e o tempo de reação a estímulos visuais e sonoros."
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
+        // Botão de dúvidas
         Column(
-            modifier = Modifier.padding(horizontal = 24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -189,27 +255,33 @@ fun PerigoScreen(onNavigateToGuardia: () -> Unit = {}) {
                 Text(
                     text = "Ainda com dúvidas?",
                     color = Color.White,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
                 )
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = null,
-                    tint = Color(0xFFFFD54F)
+                    tint = Color(0xFFFFD700),
+                    modifier = Modifier.size(24.dp)
                 )
             }
             Button(
                 onClick = onNavigateToGuardia,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(50)
+                shape = RoundedCornerShape(50),
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(48.dp)
             ) {
                 Text(
                     text = "Converse com a Guardiã",
                     color = title_color,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
                 )
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
@@ -217,25 +289,25 @@ fun PerigoScreen(onNavigateToGuardia: () -> Unit = {}) {
 
 @Composable
 private fun PerigoTopAppBar() {
-    Column(modifier = Modifier.padding(top = 30.dp)) {
+    Column {
         HorizontalDivider(color = Color.White.copy(alpha = 0.5f), thickness = 1.dp)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White.copy(alpha = 0.2f))
-                .padding(vertical = 12.dp),
+                .background(card_bg_color)
+                .padding(vertical = 14.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Perigo dos jogos online",
-                color = title_color,
-                fontSize = 22.sp,
+                color = text_color_on_dark,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 style = TextStyle(
                     shadow = Shadow(
-                        color = Color.White,
+                        color = Color.White.copy(alpha = 0.4f),
                         offset = Offset(0f, 0f),
-                        blurRadius = 10f
+                        blurRadius = 8f
                     )
                 )
             )
@@ -245,105 +317,79 @@ private fun PerigoTopAppBar() {
 }
 
 @Composable
-private fun SectionHeader(title: String, subtitle: String) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = Color(0xFF355A86)
-    ) {
-        Column(
-            modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp)
-        ) {
-            Text(
-                text = title,
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = subtitle,
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 16.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun RiskInfoItem(title: String, description: String) {
+private fun RiskInfoItem(title: String, description: String) {
     Column {
         Text(
             title,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            description,
-            color = Color.White.copy(alpha = 0.9f),
-            fontSize = 14.sp,
-            lineHeight = 20.sp
-        )
-    }
-}
-
-@Composable
-fun BenefitItem(title: String, description: String) {
-    Row(
-        modifier = Modifier
-            .padding(vertical = 12.dp)
-            .height(IntrinsicSize.Min)
-    ) {
-        Text(
-            title,
-            modifier = Modifier.weight(1f),
-            color = Color.White,
+            color = text_color_on_dark,
             fontWeight = FontWeight.Bold,
             fontSize = 15.sp
         )
-        VerticalDivider(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width(1.dp),
-            color = Color.White.copy(alpha = 0.5f)
-        )
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             description,
-            modifier = Modifier
-                .weight(1.5f)
-                .padding(start = 12.dp),
-            color = Color.White,
-            fontSize = 14.sp,
+            color = text_color_on_dark.copy(alpha = 0.95f),
+            fontSize = 13.sp,
             lineHeight = 18.sp
         )
     }
 }
 
 @Composable
-private fun PerigoSectionCard(title: String) {
+private fun BenefitItem(title: String, description: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+    ) {
+        Text(
+            title,
+            modifier = Modifier.weight(1f),
+            color = text_color_on_dark,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            lineHeight = 18.sp
+        )
+        VerticalDivider(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = 12.dp)
+                .width(1.dp),
+            color = Color.White.copy(alpha = 0.5f)
+        )
+        Text(
+            description,
+            modifier = Modifier.weight(1.5f),
+            color = text_color_on_dark,
+            fontSize = 13.sp,
+            lineHeight = 17.sp
+        )
+    }
+}
+
+@Composable
+private fun TitleCard(text: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .background(
-                color = Color.White.copy(alpha = 0.2f),
-                shape = RoundedCornerShape(50.dp)
-            )
-            .padding(vertical = 12.dp, horizontal = 16.dp),
+            .clip(RoundedCornerShape(16.dp))
+            .background(card_bg_color)
+            .padding(vertical = 14.dp, horizontal = 20.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = title,
-            color = title_color,
-            fontSize = 18.sp,
+            text = text,
+            color = text_color_on_dark,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
+            lineHeight = 20.sp,
             style = TextStyle(
                 shadow = Shadow(
-                    color = Color.White,
+                    color = Color.White.copy(alpha = 0.3f),
                     offset = Offset.Zero,
-                    blurRadius = 10f
+                    blurRadius = 8f
                 )
             )
         )
@@ -351,35 +397,16 @@ private fun PerigoSectionCard(title: String) {
 }
 
 @Composable
-fun InfoText(
+private fun InfoText(
     text: String,
-    highlights: List<String>,
-    color: Color = Color.White,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = text_color_on_dark
 ) {
     Text(
-        buildAnnotatedString {
-            var currentIndex = 0
-
-            while (currentIndex < text.length) {
-                val highlightFound = highlights.firstOrNull { highlight ->
-                    text.startsWith(highlight, currentIndex)
-                }
-
-                if (highlightFound != null) {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(highlightFound)
-                    }
-                    currentIndex += highlightFound.length
-                } else {
-                    append(text[currentIndex])
-                    currentIndex++
-                }
-            }
-        },
+        text = text,
         color = color,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
         modifier = modifier
     )
 }

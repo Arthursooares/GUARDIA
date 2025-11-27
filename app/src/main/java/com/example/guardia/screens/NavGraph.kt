@@ -92,7 +92,7 @@ fun AppNavGraph(navController: NavHostController) {
                         "chat"   -> navController.navigate("guardia")
                         "tips"   -> navController.navigate("tips")
                         "config" -> navController.navigate("config")
-                        "feedback" -> navController.navigate("feedback") // 👉 se tiver opção de feedback no perfil
+                        "feedback" -> navController.navigate("feedback")
                     }
                 },
                 onNavigateToEdit = { navController.navigate("editProfile") },

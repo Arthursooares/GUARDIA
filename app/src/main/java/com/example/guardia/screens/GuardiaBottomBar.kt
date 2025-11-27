@@ -21,6 +21,10 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -77,10 +81,11 @@ fun GuardiaBottomBar(
                     onClick = { onItemClick("perfil") },
                     modifier = Modifier.weight(1f)
                 ) {
+                    val isSelected = currentRoute == "perfil"
                     Icon(
-                        imageVector = Icons.Filled.Person,
+                        imageVector = if (isSelected) Icons.Filled.Person else Icons.Outlined.Person,
                         contentDescription = "Perfil",
-                        tint = if (currentRoute == "perfil") PrimaryBlue else TitleDark
+                        tint = if (isSelected) PrimaryBlue else TitleDark
                     )
                 }
 
@@ -89,25 +94,27 @@ fun GuardiaBottomBar(
                     onClick = { onItemClick("chat") },
                     modifier = Modifier.weight(1f)
                 ) {
+                    val isSelected = currentRoute == "chat"
                     Icon(
-                        imageVector = Icons.Filled.ChatBubble,
+                        imageVector = if (isSelected) Icons.Filled.ChatBubble else Icons.Outlined.ChatBubbleOutline,
                         contentDescription = "Chat",
-                        tint = if (currentRoute == "chat") PrimaryBlue else TitleDark
+                        tint = if (isSelected) PrimaryBlue else TitleDark
                     )
                 }
 
                 // Espaço pro botão central flutuante
                 Spacer(modifier = Modifier.width(56.dp))
 
-                // Dicas (ANTES era Grupo)
+                // Dicas
                 IconButton(
                     onClick = { onItemClick("tips") },
                     modifier = Modifier.weight(1f)
                 ) {
+                    val isSelected = currentRoute == "tips"
                     Icon(
-                        imageVector = Icons.Filled.Lightbulb,
+                        imageVector = if (isSelected) Icons.Filled.Lightbulb else Icons.Outlined.Lightbulb,
                         contentDescription = "Dicas",
-                        tint = if (currentRoute == "tips") PrimaryBlue else TitleDark
+                        tint = if (isSelected) PrimaryBlue else TitleDark
                     )
                 }
 
@@ -116,10 +123,11 @@ fun GuardiaBottomBar(
                     onClick = { onItemClick("config") },
                     modifier = Modifier.weight(1f)
                 ) {
+                    val isSelected = currentRoute == "config"
                     Icon(
-                        imageVector = Icons.Filled.Settings,
+                        imageVector = if (isSelected) Icons.Filled.Settings else Icons.Outlined.Settings,
                         contentDescription = "Configurações",
-                        tint = if (currentRoute == "config") PrimaryBlue else TitleDark
+                        tint = if (isSelected) PrimaryBlue else TitleDark
                     )
                 }
             }
