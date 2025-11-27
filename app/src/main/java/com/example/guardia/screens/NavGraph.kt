@@ -157,6 +157,12 @@ fun AppNavGraph(navController: NavHostController) {
             )
         }
 
+        composable("perigos") {
+            PerigoScreen()
+        }
+
+
+
 
     }
 }

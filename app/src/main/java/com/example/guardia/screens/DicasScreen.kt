@@ -244,9 +244,11 @@ fun GuardiaTipsScreen(
                         .padding(horizontal = 20.dp)
                         .fillMaxWidth()
                         .fillMaxHeight(0.95f)
-                        .clickable { // AQUI: Adicionamos o clique
-                            if (tip.id == 3) {
-                                navController.navigate("cuidados")
+                        .clickable {
+                            when (tip.id) {
+                                1 -> navController.navigate("perigos")
+                                2 -> navController.navigate("comunicacao_familiar")
+                                3 -> navController.navigate("cuidados")
                             }
                         },
                     shape = RoundedCornerShape(32.dp),

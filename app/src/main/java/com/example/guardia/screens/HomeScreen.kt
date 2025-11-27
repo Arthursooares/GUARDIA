@@ -330,7 +330,7 @@ fun HomeScreen(
                 title = "Upgrade Guardiã",
                 imageRes = R.drawable.estrela,
                 onClick = {
-                    navController.navigate("relatorios")
+                    navController.navigate("upgrade")
                 },
 
                         imageSize = 74.dp,
