@@ -311,7 +311,7 @@ fun FeedbackScreen(
 
             // ===== BOTTOM NAVIGATION BAR (ajustada) =====
             GuardiaBottomBar(
-                currentRoute = "tips",
+                currentRoute = "feedback",
                 onItemClick = onBottomItemClick
             )
 
