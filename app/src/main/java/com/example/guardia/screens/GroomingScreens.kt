@@ -33,7 +33,7 @@ private val BannerYellow = Color(0xFFFDD835)
 private val CardWhite = Color.White
 
 @Composable
-fun GroomingScreen() {
+fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -176,7 +176,7 @@ fun GroomingScreen() {
         }
 
         // 6. Rodapé
-        GroomingFooter()
+        GroomingFooter(onNavigateToGuardia = onNavigateToGuardia)
 
         Spacer(modifier = Modifier.height(16.dp))
     }
@@ -223,7 +223,7 @@ private fun GroomingBlobBackground() {
 }
 
 @Composable
-private fun GroomingFooter() {
+private fun GroomingFooter(onNavigateToGuardia: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -263,7 +263,7 @@ private fun GroomingFooter() {
             }
             Spacer(modifier = Modifier.height(4.dp))
             Button(
-                onClick = { },
+                onClick = onNavigateToGuardia,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 shape = RoundedCornerShape(50),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),

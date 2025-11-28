@@ -5,7 +5,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
-
 @Composable
 fun AppNavGraph(navController: NavHostController) {
     NavHost(
@@ -42,15 +41,19 @@ fun AppNavGraph(navController: NavHostController) {
                 navController = navController,
                 onItemClick = { route ->
                     when (route) {
+                        // ÍCONE DE CHAT DA BOTTOM BAR
+                        "chat" -> navController.navigate("guardia")
 
-                        // bottom bar:
-                        "chat"   -> navController.navigate("guardia")
-                        "home"   -> navController.navigate("home") { launchSingleTop = true }
-                        "perfil" -> navController.navigate("perfil")
-                        "tips"   -> navController.navigate("tips")
-                        "config" -> navController.navigate("config")
+                        // Botão flutuante ou outros que mandem "home"
+                        "home" -> navController.navigate("home") {
+                            launchSingleTop = true
+                        }
 
-                        else -> {}
+                        "perfil"   -> navController.navigate("perfil")
+                        "grupo"    -> navController.navigate("grupo")
+                        "config"   -> navController.navigate("config")
+                        "feedback" -> navController.navigate("feedback") // 👉 se você usar essa rota na bottom bar
+                        else -> { /* navController.navigate(route) */ }
                     }
                 },
                 onChatClick = {
@@ -60,12 +63,12 @@ fun AppNavGraph(navController: NavHostController) {
             )
         }
 
-        // 🟣 Guardia (chat)
+        // 🟣 Guardia (tela de chat)
         composable("guardia") {
             GuardiaScreen()
         }
 
-        // 🔹 Dicas
+        // 🔹 Tela de Dicas
         composable("tips") {
             GuardiaTipsScreen(navController = navController)
         }
@@ -87,48 +90,39 @@ fun AppNavGraph(navController: NavHostController) {
             PerfilScreen(
                 onItemClick = { route ->
                     when (route) {
-                        "home"   -> navController.navigate("home") { launchSingleTop = true }
-                        "perfil" -> { /* já está aqui */ }
+                        "home" -> navController.navigate("home") {
+                            launchSingleTop = true
+                        }
+                        "perfil" -> { /* já está nela */ }
                         "chat"   -> navController.navigate("guardia")
                         "tips"   -> navController.navigate("tips")
                         "config" -> navController.navigate("config")
-                        "feedback" -> navController.navigate("feedback")
+                        "feedback" -> navController.navigate("feedback") // 👉 se tiver opção de feedback no perfil
                     }
                 },
                 onNavigateToEdit = { navController.navigate("editProfile") },
                 onNavigateToSecurity = { navController.navigate("security") },
                 onNavigateToSaved = { navController.navigate("saved") },
-                onNavigateToPlans = { navController.navigate("upgrade") }
+                onNavigateToPlans = {
+                    navController.navigate("upgrade")
+                }
             )
         }
 
         // 📝 Feedback
         composable("feedback") {
             FeedbackScreen(
-                onBackClick = { navController.popBackStack() },
-                onBottomItemClick = { route ->
-                    when (route) {
-                        "home"   -> navController.navigate("home")
-                        "perfil" -> navController.navigate("perfil")
-                        "chat"   -> navController.navigate("guardia")
-                        "tips"   -> navController.navigate("tips")
-                        "config" -> navController.navigate("config")
-                    }
-                }
+                onBackClick = { navController.popBackStack() } // seta volta pra tela anterior
             )
         }
 
-        // ⭐ Editar perfil
+        // Novas rotas
         composable("editProfile") {
             EditScreen(onUpdateClick = { navController.popBackStack() })
         }
-
-        // 🔐 Segurança
         composable("security") {
             SenhaScreen(onBackClick = { navController.popBackStack() })
         }
-
-        // 💾 Salvos
         composable("saved") {
             SalvosScreen(onBackClick = { navController.popBackStack() })
         }
@@ -136,33 +130,9 @@ fun AppNavGraph(navController: NavHostController) {
         composable("cuidados") {
             CuidadosScreen(onNavigateToGuardia = { navController.navigate("guardia") })
         }
-
-
-
-        composable("comunicacao_familiar") {
-            ComunicacaoFamiliarScreen(navController)
+        // AQUI: Nova rota para a tela de grooming
+        composable("grooming") {
+            GroomingScreen()
         }
-
-        composable("relatorios") {
-            MeusRelatoriosScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                onHomeClick = {
-                    navController.navigate("home") {
-                        popUpTo("home") { inclusive = false }
-                        launchSingleTop = true
-                    }
-                }
-            )
-        }
-
-        composable("perigos") {
-            PerigoScreen()
-        }
-
-
-
-
     }
 }
