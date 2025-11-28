@@ -1,6 +1,8 @@
 package com.example.guardia.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -12,8 +14,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -22,15 +26,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.guardia.ui.theme.GuardiaTheme
+import com.example.guardia.R
 
-// --- Cores Específicas do Glossário ---
-private val BackgroundBlue = Color(0xFFD6E4F5)
-private val HeaderBlue = Color(0xFFC0D5EF)
-private val TextDarkBlue = Color(0xFF1A237E)
-private val BlobRed = Color(0xFFB71C1C)
-private val BannerYellow = Color(0xFFFDD835)
-private val CardWhite = Color.White
+// === DEFINIÇÃO DAS CORES (PADRONIZADAS) ===
+private val brand900 = Color(0xFF1F367C) // Azul Escuro (Texto)
+private val brand200 = Color(0xFFCDE0FF) // Azul Claro (Fundo)
+private val yellow50 = Color(0xFFFFEB3B) // Amarelo (Destaque)
+private val redDark = Color(0xFFB71C1C)  // Vermelho Escuro
+private val redLight = Color(0xFFE53935) // Vermelho Claro
 
 @Composable
 fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
@@ -39,246 +42,286 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundBlue)
+            .background(brand200) // CORRIGIDO: brand200 em vez de BlueBackground
             .verticalScroll(scrollState)
     ) {
-        // 1. Topo: Título Principal
+
+        // === 1. TÍTULO SUPERIOR ===
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(HeaderBlue)
-                .padding(vertical = 16.dp),
+                .padding(top = 48.dp, bottom = 10.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Glossário Grooming",
-                color = TextDarkBlue,
-                fontSize = 22.sp,
+                color = brand900, // CORRIGIDO: brand900 em vez de DarkBlueText
+                fontSize = 26.sp,
                 fontWeight = FontWeight.Bold
             )
         }
 
-        // 2. Card de Definição
+        // === 2. HERO SECTION ===
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 24.dp),
-            contentAlignment = Alignment.Center
+                .height(200.dp)
         ) {
-            GroomingBlobBackground() // Fundo decorativo
+            // Bola Vermelha Esquerda (Média)
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.CenterStart)
+                    .offset(x = (-20).dp, y = (-20).dp)
+                    .background(redDark, CircleShape) // CORRIGIDO: redDark
+            )
 
-            Card(
-                modifier = Modifier.width(300.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            // Bola Vermelha Pequena (Abaixo da esquerda)
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .align(Alignment.BottomStart)
+                    .offset(x = 40.dp, y = (-10).dp)
+                    .background(redLight, CircleShape) // CORRIGIDO: redLight
+            )
+
+            // Bola Vermelha Grande (Direita - Cortada)
+            Box(
+                modifier = Modifier
+                    .size(140.dp)
+                    .align(Alignment.TopEnd)
+                    .offset(x = 40.dp, y = 0.dp)
+                    .background(redDark, CircleShape) // CORRIGIDO: redDark
+            )
+
+            // A Pílula Branca
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .background(Color.White, RoundedCornerShape(50.dp))
+                    .padding(horizontal = 40.dp, vertical = 20.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "O que é\nGrooming?",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextDarkBlue,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Text(
-                        text = "Grooming é o processo que um predador (aliciador) usa para ganhar a confiança de uma criança ou adolescente na internet. É uma manipulação lenta e calculada.",
-                        fontSize = 14.sp,
-                        color = Color.Black,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                Text(
+                    text = "O que é\nGrooming?",
+                    color = brand900, // CORRIGIDO
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 28.sp
+                )
             }
         }
 
-        // 3. Faixa Amarela
+        // === 3. TEXTO INTRODUTÓRIO ===
+        Text(
+            text = "Grooming é o processo que um predador (aliciador) usa para ganhar a confiança de uma criança ou adolescente na internet. É uma manipulação lenta e calculada.",
+            color = brand900, // CORRIGIDO
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp)
+        )
+
+        // === 4. FAIXA AMARELA ===
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BannerYellow)
-                .padding(16.dp),
+                .background(yellow50) // CORRIGIDO: yellow50 em vez de YellowHeader
+                .padding(vertical = 20.dp, horizontal = 20.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Códigos mais comuns usados por aliciadores para se comunicar e camuflar na internet:",
-                color = TextDarkBlue,
+                color = brand900, // CORRIGIDO
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                fontSize = 15.sp
+                fontSize = 17.sp
             )
         }
 
-        // 4. Lista de Itens
+        // === 5. A LISTA DE ITENS ===
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
-            GroomingItem("Trade / Troca", "Usado para negociar e trocar material de abuso sexual infantil.")
-            GroomingItem("Stars (Estrelas)", "Crianças \"populares\" por suas fotos famosas trocadas em grupos.")
-            GroomingItem("🌽 (milho)", "Tradução de corn -> porn. Emoji para pornografia infantil.")
-            GroomingItem("🌀 (espiral azul)", "Indica o interesse sexual por meninos.")
-            GroomingItem("🍜 (macarrão)", "Noodles soa como nudes. Usado para pedir imagens íntimas.")
-            GroomingItem("💖 e 🧀", "Coração e queijo: busca por imagens de meninas.")
-            GroomingItem("🍭 (pirulito)", "Remete à obra Lolita (abuso sexual).")
-            GroomingItem("🍬 e 🍕", "Bala e Pizza: códigos de aprovação ou interesse em crianças.")
-            GroomingItem("👉👈 + OK", "Representa relação sexual.")
-            GroomingItem("🍆 / 🍌", "Representação da genitália masculina.")
-            GroomingItem("😏 Sorriso", "Tom sedutor ou insinuante.")
-            GroomingItem("“Sua Princesa”", "Afeto excessivo para criar intimidade falsa.")
-            GroomingItem("DM / Kik / Snap", "Pedido para migrar para chats privados/criptografados.")
-            GroomingItem("“Patrocínio”", "Referência a Sugar Daddy/Mommy.")
-            GroomingItem("ASL", "Age, Sex, Location: Pedido de dados pessoais.")
-            GroomingItem("M / F", "Male / Female: Pergunta de gênero.")
-            GroomingItem("MIRL", "Meet in real life: Tentar encontro presencial.")
-            GroomingItem("IYKYK", "Código para segredos do grupo.")
-            GroomingItem("KOTC", "Beijo na bochecha: Normalizar contato físico.")
-            GroomingItem("LSKOL", "Beijo de língua: Termo explícito.")
-            GroomingItem("PS (Parents)", "Alerta sobre a presença dos pais.")
-            GroomingItem("👀 Olhos", "Espiar/Observar a vítima.")
-            GroomingItem("😋 Rosto", "Gostou do conteúdo/aparência.")
-            GroomingItem("Upada / Down", "Subindo ou baixando conteúdo ilegal.")
-            GroomingItem("Trade DMs", "Troca de material ilícito.")
+            GroomingItem("Stars (Estrelas)", "Criança \"populares\" por suas fotos famosas trocadas em grupos e fóruns.")
+
+            GroomingItem("DM/Kik/Wickr/Snap", "Pedido para migrar a conversa para chats privados e criptografados.")
+
+            GroomingItem("Acompanhamento/Patrocínio", "Referência a Sugar Daddy/Mommy ou promessas de presentes.")
+
+            GroomingItem("ASL", "Age, Sex, Location (Idade, Sexo, Localização).")
+
+            GroomingItem("M / F", "Male / Female (Masculino / Feminino).")
+
+            GroomingItem("MIRL", "Meet in real life.")
+
+            GroomingItem("IYKYK", "If You Know, You Know: código secreto.")
+
+            GroomingItem("KOTC", "Kiss on the cheek.")
+
+            GroomingItem("LSKOL", "Long slow kiss on the lips.")
+
+            GroomingItem("PS (Parents)", "Parents: Alerta sobre presença dos pais.")
+
+            GroomingItem("Upado", "Upload: subindo conteúdo.")
+
+            GroomingItem("Down", "Download: baixando conteúdo.")
+
+            GroomingItem("Trade DMs", "Troca de material via DM.")
+
             GroomingItem("G.A.S.", "Gamer as Sender ou código para abuso.")
+
+            GroomingItem("Sua Princesa", "Afeto excessivo para criar intimidade falsa.")
+
+            GroomingItem("👀 (Olhos)", "Espiar/Observar a vítima.")
+
+            GroomingItem("😋 (Rosto)", "Gostou do conteúdo.")
+
+            GroomingItem("🤸", "Pode referir a posições sexuais.")
+
+            GroomingItem("👉👈", "Timidez fingida para manipular.")
+
+            GroomingItem("🌽 (milho)", "Tradução de corn -> porn.")
+
+            GroomingItem("🌀", "Interesse sexual por meninos.")
+
+            GroomingItem("🍜", "Noodles soa como nudes.")
+
+            GroomingItem("💗 e 🧀", "Busca por imagens de meninas.")
+
+            GroomingItem("🍭", "Remete à obra Lolita.")
+
+            GroomingItem("🍬 e 🍕", "Códigos para interesse em crianças.")
+
+            GroomingItem("👉 + 👌", "Representar relação sexual.")
+
+            GroomingItem("🍆 / 🍌", "Representação da genitália masculina.")
+
+            GroomingItem("😏", "Sorriso Malicioso.")
+
+
         }
 
-        // 5. Card Atenção
-        Card(
+        // === 6. BOX DE ATENÇÃO ===
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = BannerYellow),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                .padding(horizontal = 24.dp, vertical = 10.dp)
+                .shadow(elevation = 6.dp, shape = RoundedCornerShape(30.dp), spotColor = Color.Black.copy(alpha = 0.2f))
+                .background(yellow50, RoundedCornerShape(30.dp))
+                .border(4.dp, Color.White, RoundedCornerShape(30.dp))
+                .padding(24.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "Atenção:",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = Color.Black,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    fontWeight = FontWeight.Black,
+                    fontSize = 20.sp,
+                    color = brand900,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
                 Text(
-                    text = "Os aliciadores usam linguagem secreta. Eles evoluem, mas a Guardiã também, trabalhando para desvendar truques e manter a segurança.",
+                    text = "Os aliciadores usam uma linguagem secreta de códigos e símbolos para agir sem serem detectados online. Eles evoluem, mas a Guardiã também, trabalhando incessantemente para desvendar cada novo truque e manter a segurança de todos.",
+                    textAlign = TextAlign.Center,
+                    color = brand900,
                     fontSize = 14.sp,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 18.sp
                 )
             }
         }
 
-        // 6. Rodapé
-        GroomingFooter(onNavigateToGuardia = onNavigateToGuardia)
+        Spacer(modifier = Modifier.height(20.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-    }
-}
-
-// --- Componentes Auxiliares (Renomeados para evitar conflito) ---
-
-@Composable
-private fun GroomingItem(term: String, definition: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.Top
-    ) {
-        Text(
-            text = "• ",
-            color = Color.Black,
-            fontSize = 14.sp,
-            modifier = Modifier.padding(top = 2.dp)
-        )
-        Text(
-            text = buildAnnotatedString {
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("$term: ")
-                }
-                append(definition)
-            },
-            color = Color.Black,
-            fontSize = 13.sp,
-            lineHeight = 18.sp
-        )
-    }
-}
-
-@Composable
-private fun GroomingBlobBackground() {
-    Box(modifier = Modifier.size(1.dp)) {
-        Box(modifier = Modifier.size(60.dp).offset((-120).dp, (-20).dp).background(BlobRed, CircleShape))
-        Box(modifier = Modifier.size(80.dp).offset(120.dp, (-10).dp).background(BlobRed, CircleShape))
-        Box(modifier = Modifier.size(50.dp).offset(140.dp, 30.dp).background(BlobRed, CircleShape))
-        Box(modifier = Modifier.size(50.dp).offset((-130).dp, 40.dp).background(BlobRed, CircleShape))
-    }
-}
-
-@Composable
-private fun GroomingFooter(onNavigateToGuardia: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp, horizontal = 24.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        // Substitua pelo seu Image resource
-        Icon(
-            imageVector = Icons.Default.Star,
-            contentDescription = "Avatar Guardiã",
+        // === 7. RODAPÉ AJUSTADO ===
+        Row(
             modifier = Modifier
-                .size(60.dp)
-                .clip(CircleShape)
-                .background(Color.DarkGray)
-                .padding(8.dp),
-            tint = Color.White
-        )
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .padding(bottom = 20.dp),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // IMAGEM DA MENINA
+            Image(
+                painter = painterResource(id = R.drawable.guardi),
+                contentDescription = "Personagem Guardiã",
+                contentScale = ContentScale.FillHeight,
+                modifier = Modifier
+                    .height(180.dp)
+                    .offset(x = (-10).dp, y = 10.dp)
+            )
 
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Ainda com\ndúvidas?",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    color = TextDarkBlue,
-                    lineHeight = 16.sp
-                )
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = null,
-                    tint = BannerYellow,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-            Button(
-                onClick = onNavigateToGuardia,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(50),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                modifier = Modifier.height(30.dp)
+            // COLUNA DA DIREITA
+            Column(
+                modifier = Modifier
+                    .padding(end = 24.dp, bottom = 20.dp)
+                    .weight(1f),
+                horizontalAlignment = Alignment.End
             ) {
-                Text("Converse com a Guardiã", color = TextDarkBlue, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                // Texto "Ainda com dúvidas?"
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Text(
+                        text = "Ainda com\ndúvidas?",
+                        color = brand900,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        fontSize = 15.sp,
+                        lineHeight = 18.sp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = Color(0xFFFFD54F),
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // BOTÃO
+                Button(
+                    onClick = onNavigateToGuardia,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White.copy(alpha = 0.4f),
+                        contentColor = brand900
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.5.dp, Color.White),
+                    shape = RoundedCornerShape(50),
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)
+                ) {
+                    Text(
+                        text = "Converse com a Guardiã",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                }
             }
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
+    }
+}
+
+// === COMPONENTE ITEM DA LISTA ===
+@Composable
+fun GroomingItem(title: String, desc: String) {
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.Top) {
+        Text("•", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = brand900, modifier = Modifier.padding(end = 8.dp, top = (-4).dp))
+        Text(buildAnnotatedString {
+            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = brand900)) { append(title) }
+            withStyle(SpanStyle(color = brand900)) { append(" $desc") }
+        }, fontSize = 14.sp, lineHeight = 18.sp)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewGroomingScreen() {
-    GuardiaTheme {
-        GroomingScreen()
-    }
+fun PreviewGroomingRefined() {
+    GroomingScreen()
 }
