@@ -247,6 +247,8 @@ fun GuardiaTipsScreen(
                         .clickable { // AQUI: Adicionamos o clique
                             if (tip.id == 3) {
                                 navController.navigate("cuidados")
+                            } else if (tip.id == 4) {
+                                navController.navigate("grooming")
                             }
                         },
                     shape = RoundedCornerShape(32.dp),
