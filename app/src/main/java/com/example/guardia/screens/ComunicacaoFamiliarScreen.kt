@@ -138,7 +138,7 @@ fun ComunicacaoFamiliarScreen(navController: NavController) {
                     modifier = Modifier
                         .height(170.dp)
                         .aspectRatio(0.85f)
-                        .offset(y = 23.dp)          // ⬇️ Desce suavemente
+                        .offset(y = 27.dp)          // ⬇️ Desce suavemente
                         .graphicsLayer {
                             scaleX = 1.15f          // 🔍 Aumenta horizontal
                             scaleY = 1.15f          // 🔍 Aumenta vertical

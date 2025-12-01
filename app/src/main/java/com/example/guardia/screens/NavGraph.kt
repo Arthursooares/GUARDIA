@@ -52,7 +52,7 @@ fun AppNavGraph(navController: NavHostController) {
                         "perfil"   -> navController.navigate("perfil")
                         "grupo"    -> navController.navigate("grupo")
                         "config"   -> navController.navigate("config")
-                        "feedback" -> navController.navigate("feedback") // 👉 se você usar essa rota na bottom bar
+                        "feedback" -> navController.navigate("feedback")
                         else -> { /* navController.navigate(route) */ }
                     }
                 },
@@ -97,7 +97,7 @@ fun AppNavGraph(navController: NavHostController) {
                         "chat"   -> navController.navigate("guardia")
                         "tips"   -> navController.navigate("tips")
                         "config" -> navController.navigate("config")
-                        "feedback" -> navController.navigate("feedback") // 👉 se tiver opção de feedback no perfil
+                        "feedback" -> navController.navigate("feedback")
                     }
                 },
                 onNavigateToEdit = { navController.navigate("editProfile") },
@@ -112,27 +112,61 @@ fun AppNavGraph(navController: NavHostController) {
         // 📝 Feedback
         composable("feedback") {
             FeedbackScreen(
-                onBackClick = { navController.popBackStack() } // seta volta pra tela anterior
+                onBackClick = { navController.popBackStack() }
             )
         }
 
-        // Novas rotas
+        // ✏️ Editar perfil
         composable("editProfile") {
             EditScreen(onUpdateClick = { navController.popBackStack() })
         }
+
+        // 🔐 Segurança / Senha
         composable("security") {
             SenhaScreen(onBackClick = { navController.popBackStack() })
         }
+
+        // 💾 Salvos
         composable("saved") {
             SalvosScreen(onBackClick = { navController.popBackStack() })
         }
-        //rota para a tela de cuidados
+
+        // 🛡️ Cuidados nas Redes Sociais
         composable("cuidados") {
-            CuidadosScreen(onNavigateToGuardia = { navController.navigate("guardia") })
+            CuidadosScreen(
+                onNavigateToGuardia = { navController.navigate("guardia") }
+            )
         }
-        // AQUI: Nova rota para a tela de grooming
+
+        // 🎮 Perigos dos jogos online
+        composable("perigosOnline") {
+            PerigoScreen(
+                onNavigateToGuardia = { navController.navigate("guardia") }
+            )
+        }
+
+        // 🗣️ Comunicação familiar
+        composable("comunicacaoFamiliar") {
+            ComunicacaoFamiliarScreen(navController = navController)
+        }
+
+        // 📕 Glossário Grooming
+        // 📕 Glossário Grooming
         composable("grooming") {
-            GroomingScreen()
+            GroomingScreen(navController = navController)
+        }
+
+
+        // 📄 Meus Relatórios ✅ NOVA ROTA
+        composable("relatorios") {
+            MeusRelatoriosScreen(
+                onBackClick = { navController.popBackStack() },
+                onHomeClick = {
+                    navController.navigate("home") {
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
     }
 }

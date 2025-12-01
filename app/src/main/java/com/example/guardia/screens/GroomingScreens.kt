@@ -26,6 +26,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.guardia.R
 
 // === DEFINIÇÃO DAS CORES (PADRONIZADAS) ===
@@ -36,13 +38,13 @@ private val redDark = Color(0xFFB71C1C)  // Vermelho Escuro
 private val redLight = Color(0xFFE53935) // Vermelho Claro
 
 @Composable
-fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
+fun GroomingScreen(navController: NavController) {
     val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(brand200) // CORRIGIDO: brand200 em vez de BlueBackground
+            .background(brand200)
             .verticalScroll(scrollState)
     ) {
 
@@ -55,7 +57,7 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
         ) {
             Text(
                 text = "Glossário Grooming",
-                color = brand900, // CORRIGIDO: brand900 em vez de DarkBlueText
+                color = brand900,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -73,7 +75,7 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
                     .size(100.dp)
                     .align(Alignment.CenterStart)
                     .offset(x = (-20).dp, y = (-20).dp)
-                    .background(redDark, CircleShape) // CORRIGIDO: redDark
+                    .background(redDark, CircleShape)
             )
 
             // Bola Vermelha Pequena (Abaixo da esquerda)
@@ -82,7 +84,7 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
                     .size(60.dp)
                     .align(Alignment.BottomStart)
                     .offset(x = 40.dp, y = (-10).dp)
-                    .background(redLight, CircleShape) // CORRIGIDO: redLight
+                    .background(redLight, CircleShape)
             )
 
             // Bola Vermelha Grande (Direita - Cortada)
@@ -91,7 +93,7 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
                     .size(140.dp)
                     .align(Alignment.TopEnd)
                     .offset(x = 40.dp, y = 0.dp)
-                    .background(redDark, CircleShape) // CORRIGIDO: redDark
+                    .background(redDark, CircleShape)
             )
 
             // A Pílula Branca
@@ -103,7 +105,7 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
             ) {
                 Text(
                     text = "O que é\nGrooming?",
-                    color = brand900, // CORRIGIDO
+                    color = brand900,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Black,
                     textAlign = TextAlign.Center,
@@ -115,7 +117,7 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
         // === 3. TEXTO INTRODUTÓRIO ===
         Text(
             text = "Grooming é o processo que um predador (aliciador) usa para ganhar a confiança de uma criança ou adolescente na internet. É uma manipulação lenta e calculada.",
-            color = brand900, // CORRIGIDO
+            color = brand900,
             textAlign = TextAlign.Center,
             fontSize = 16.sp,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp)
@@ -125,13 +127,13 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(yellow50) // CORRIGIDO: yellow50 em vez de YellowHeader
+                .background(yellow50)
                 .padding(vertical = 20.dp, horizontal = 20.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Códigos mais comuns usados por aliciadores para se comunicar e camuflar na internet:",
-                color = brand900, // CORRIGIDO
+                color = brand900,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 fontSize = 17.sp
@@ -145,62 +147,33 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
                 .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
             GroomingItem("Stars (Estrelas)", "Criança \"populares\" por suas fotos famosas trocadas em grupos e fóruns.")
-
             GroomingItem("DM/Kik/Wickr/Snap", "Pedido para migrar a conversa para chats privados e criptografados.")
-
             GroomingItem("Acompanhamento/Patrocínio", "Referência a Sugar Daddy/Mommy ou promessas de presentes.")
-
             GroomingItem("ASL", "Age, Sex, Location (Idade, Sexo, Localização).")
-
             GroomingItem("M / F", "Male / Female (Masculino / Feminino).")
-
             GroomingItem("MIRL", "Meet in real life.")
-
             GroomingItem("IYKYK", "If You Know, You Know: código secreto.")
-
             GroomingItem("KOTC", "Kiss on the cheek.")
-
             GroomingItem("LSKOL", "Long slow kiss on the lips.")
-
             GroomingItem("PS (Parents)", "Parents: Alerta sobre presença dos pais.")
-
             GroomingItem("Upado", "Upload: subindo conteúdo.")
-
             GroomingItem("Down", "Download: baixando conteúdo.")
-
             GroomingItem("Trade DMs", "Troca de material via DM.")
-
             GroomingItem("G.A.S.", "Gamer as Sender ou código para abuso.")
-
             GroomingItem("Sua Princesa", "Afeto excessivo para criar intimidade falsa.")
-
             GroomingItem("👀 (Olhos)", "Espiar/Observar a vítima.")
-
             GroomingItem("😋 (Rosto)", "Gostou do conteúdo.")
-
             GroomingItem("🤸", "Pode referir a posições sexuais.")
-
             GroomingItem("👉👈", "Timidez fingida para manipular.")
-
             GroomingItem("🌽 (milho)", "Tradução de corn -> porn.")
-
             GroomingItem("🌀", "Interesse sexual por meninos.")
-
             GroomingItem("🍜", "Noodles soa como nudes.")
-
             GroomingItem("💗 e 🧀", "Busca por imagens de meninas.")
-
             GroomingItem("🍭", "Remete à obra Lolita.")
-
             GroomingItem("🍬 e 🍕", "Códigos para interesse em crianças.")
-
             GroomingItem("👉 + 👌", "Representar relação sexual.")
-
             GroomingItem("🍆 / 🍌", "Representação da genitália masculina.")
-
             GroomingItem("😏", "Sorriso Malicioso.")
-
-
         }
 
         // === 6. BOX DE ATENÇÃO ===
@@ -208,7 +181,11 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp, vertical = 10.dp)
-                .shadow(elevation = 6.dp, shape = RoundedCornerShape(30.dp), spotColor = Color.Black.copy(alpha = 0.2f))
+                .shadow(
+                    elevation = 6.dp,
+                    shape = RoundedCornerShape(30.dp),
+                    spotColor = Color.Black.copy(alpha = 0.2f)
+                )
                 .background(yellow50, RoundedCornerShape(30.dp))
                 .border(4.dp, Color.White, RoundedCornerShape(30.dp))
                 .padding(24.dp)
@@ -286,7 +263,7 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
 
                 // BOTÃO
                 Button(
-                    onClick = onNavigateToGuardia,
+                    onClick = { navController.navigate("guardia") },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White.copy(alpha = 0.4f),
                         contentColor = brand900
@@ -311,17 +288,39 @@ fun GroomingScreen(onNavigateToGuardia: () -> Unit = {}) {
 // === COMPONENTE ITEM DA LISTA ===
 @Composable
 fun GroomingItem(title: String, desc: String) {
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.Top) {
-        Text("•", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = brand900, modifier = Modifier.padding(end = 8.dp, top = (-4).dp))
-        Text(buildAnnotatedString {
-            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = brand900)) { append(title) }
-            withStyle(SpanStyle(color = brand900)) { append(" $desc") }
-        }, fontSize = 14.sp, lineHeight = 18.sp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(
+            "•",
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            color = brand900,
+            modifier = Modifier.padding(end = 8.dp) // ✅ sem padding negativo
+        )
+        Text(
+            buildAnnotatedString {
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = brand900)) {
+                    append(title)
+                }
+                withStyle(SpanStyle(color = brand900)) {
+                    append(" $desc")
+                }
+            },
+            fontSize = 14.sp,
+            lineHeight = 18.sp
+        )
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun PreviewGroomingRefined() {
-    GroomingScreen()
+fun PreviewGroomingScreen() {
+    val navController = rememberNavController()
+    MaterialTheme {
+        GroomingScreen(navController)
+    }
 }

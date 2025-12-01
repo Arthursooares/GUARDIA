@@ -105,7 +105,7 @@ private fun TipsCard(
     imageSize: Dp = 70.dp,
     imageScale: Float = 1.0f,
     imagePadding: Dp = 0.dp,
-    imageOffsetX: Dp =  (-2).dp,
+    imageOffsetX: Dp =  (-3).dp,
     imageOffsetY: Dp = 0.dp,
     cardHeight: Dp = 84.dp,
     textStartPadding: Dp = 110.dp
@@ -289,7 +289,7 @@ fun HomeScreen(
                                     scaleX = 1.8f
                                     scaleY = 1.8f
                                     translationY = (-26).dp.toPx()   // sobe a imagem
-                                    translationX = (-12).dp.toPx()   // move para a esquerda
+                                    translationX = (-20).dp.toPx()   // move para a esquerda
                                     transformOrigin = TransformOrigin.Center
                                 },
                             contentScale = ContentScale.Fit

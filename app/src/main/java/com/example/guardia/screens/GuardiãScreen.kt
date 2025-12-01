@@ -168,16 +168,28 @@ private fun AssistantMessage(msg: MessageUi) {
 }
 
 // bolha do usuário (direita)
+// bolha do usuário (direita)
 @Composable
 private fun UserMessage(msg: MessageUi) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 70.dp, end = 10.dp, top = 6.dp, bottom = 6.dp),
+            .padding(
+                start = 70.dp,
+                end = 10.dp,
+                top = 6.dp,
+                bottom = 6.dp
+            ),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.Bottom
     ) {
+
+        // 🔵 bolha com largura limitada REAL (não força o avatar)
         Surface(
+            modifier = Modifier
+                .weight(1f, false)           // não espreme nada
+                .padding(end = 8.dp)
+                .widthIn(max = 250.dp),       // limite ideal para bolha
             color = Color(0xFF21A189),
             contentColor = Color.White,
             shape = RoundedCornerShape(16.dp)
@@ -190,11 +202,10 @@ private fun UserMessage(msg: MessageUi) {
             )
         }
 
-        Spacer(Modifier.width(8.dp))
-
+        // 🟣 Avatar preservado SEM alterar tamanho ou aspecto
         Box(
             modifier = Modifier
-                .size(64.dp)
+                .size(64.dp)           // tamanho ORIGINAL
                 .clip(CircleShape)
                 .background(Color(0xFF21A189)),
             contentAlignment = Alignment.Center
@@ -203,13 +214,15 @@ private fun UserMessage(msg: MessageUi) {
                 painter = painterResource(id = R.drawable.livia),
                 contentDescription = "Usuária",
                 modifier = Modifier
-                    .fillMaxSize(1.0f)
+                    .fillMaxSize()
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
         }
     }
 }
+
+
 
 @Composable
 private fun ChatBubble(msg: MessageUi) {
