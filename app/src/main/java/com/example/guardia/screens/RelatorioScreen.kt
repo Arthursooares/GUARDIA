@@ -231,7 +231,7 @@ fun MeusRelatoriosScreen(
     }
 }
 
-// ===== ICON DO CLIPBOARD (já estava bonito, só reaproveitado) =====
+// ===== ICON DO CLIPBOARD =====
 @Composable
 fun ClipboardIconDetailed() {
     Box(
@@ -293,7 +293,7 @@ fun ClipboardIconDetailed() {
     }
 }
 
-// ===== CARD DO RELATÓRIO – parecido com os do protótipo =====
+// ===== CARD DO RELATÓRIO =====
 @Composable
 fun RelatorioCardDetailed(
     relatorio: RelatorioEntity,
@@ -354,7 +354,7 @@ fun RelatorioCardDetailed(
     }
 }
 
-// ===== BOTTOM BAR CUSTOM (continua igual, mesmo que não esteja sendo usado aqui) =====
+// ===== BOTTOM BAR CUSTOM =====
 @Composable
 fun BottomNavigationBarCustom(
     selectedTab: Int,
@@ -443,7 +443,7 @@ fun BottomNavIconItem(
     }
 }
 
-// ===== GERAÇÃO E COMPARTILHAMENTO DE PDF (mesma lógica) =====
+// ===== GERAÇÃO E COMPARTILHAMENTO DE PDF =====
 private fun gerarECompartilharPdf(
     context: Context,
     relatorio: RelatorioEntity
@@ -467,53 +467,97 @@ private fun gerarECompartilharPdf(
     )
 }
 
+// ===== PDF COM ALTURA DINÂMICA + FONTE BEM GRANDE =====
 private fun criarPdfDoRelatorio(
     context: Context,
     relatorio: RelatorioEntity
 ): File {
-    val pageWidth = 595
-    val pageHeight = 842
+    val pageWidth = 595                  // largura A4 em pontos
+    val minPageHeight = 400              // altura mínima
+
     val marginStart = 40f
     val marginEnd = 40f
-    val marginTop = 40f
-    val marginBottom = 40f
-    val lineHeight = 22f
+    val marginTop = 50f
+    val marginBottom = 50f
 
-    val pdfDocument = PdfDocument()
-
-    var pageNumber = 1
-    var pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
-    var page = pdfDocument.startPage(pageInfo)
-    var canvas = page.canvas
+    // 🔥 FONTE GRANDONA
+    val bodyTextSize = 32f               // texto
+    val titleTextSize = 40f              // título
+    val lineHeight = 50f                 // espaçamento entre linhas
 
     val paint = Paint().apply {
         isAntiAlias = true
-        textSize = 14f
+        textSize = bodyTextSize
         color = android.graphics.Color.BLACK
+        typeface = android.graphics.Typeface.DEFAULT
     }
 
-    var y = marginTop
     val maxWidth = pageWidth - marginStart - marginEnd
 
-    fun newPage() {
-        pdfDocument.finishPage(page)
-        pageNumber++
-        pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create()
-        page = pdfDocument.startPage(pageInfo)
-        canvas = page.canvas
-        y = marginTop
+    // Conta quantas linhas serão necessárias
+    fun countLines(text: String, isTitle: Boolean = false): Int {
+        val tempPaint = Paint(paint)
+        tempPaint.textSize = if (isTitle) titleTextSize else bodyTextSize
+
+        if (text.isEmpty()) return 1
+
+        val words = text.split(" ")
+        var line = ""
+        var lines = 0
+
+        for (word in words) {
+            val candidate = if (line.isEmpty()) word else "$line $word"
+            if (tempPaint.measureText(candidate) > maxWidth) {
+                lines++
+                line = word
+            } else {
+                line = candidate
+            }
+        }
+
+        if (line.isNotEmpty()) lines++
+        return lines
     }
 
-    fun drawWrapped(text: String, bold: Boolean = false) {
+    // Blocos de conteúdo
+    val conteudo: List<Pair<String, Boolean>> = listOf(
+        "Relatório Guardiã" to true,
+        "" to false,
+        "Resumo da situação: ${relatorio.resumo}" to false,
+        "Categoria: ${relatorio.categoria}" to false,
+        "Nível de risco: ${relatorio.risco}" to false,
+        "Orientação: ${relatorio.orientacao}" to false,
+        "Encaminhamento: ${relatorio.encaminhamento}" to false,
+        "" to false
+    )
+
+    var totalLines = 0
+    conteudo.forEach { (text, isTitle) ->
+        totalLines += countLines(text, isTitle)
+    }
+
+    val contentHeight = marginTop + totalLines * lineHeight + marginBottom
+    val pageHeight = if (contentHeight < minPageHeight) {
+        minPageHeight
+    } else {
+        contentHeight.toInt()
+    }
+
+    val pdfDocument = PdfDocument()
+    val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
+    val page = pdfDocument.startPage(pageInfo)
+    val canvas = page.canvas
+
+    var y = marginTop
+
+    fun drawWrapped(text: String, isTitle: Boolean = false) {
         if (text.isEmpty()) {
             y += lineHeight
-            if (y > pageHeight - marginBottom) {
-                newPage()
-            }
             return
         }
 
-        paint.typeface = if (bold) {
+        paint.textSize = if (isTitle) titleTextSize else bodyTextSize
+        paint.typeface = if (isTitle) {
             android.graphics.Typeface.create(
                 android.graphics.Typeface.DEFAULT,
                 android.graphics.Typeface.BOLD
@@ -530,11 +574,6 @@ private fun criarPdfDoRelatorio(
             if (paint.measureText(candidate) > maxWidth) {
                 canvas.drawText(line, marginStart, y, paint)
                 y += lineHeight
-
-                if (y > pageHeight - marginBottom) {
-                    newPage()
-                }
-
                 line = word
             } else {
                 line = candidate
@@ -544,21 +583,12 @@ private fun criarPdfDoRelatorio(
         if (line.isNotEmpty()) {
             canvas.drawText(line, marginStart, y, paint)
             y += lineHeight
-
-            if (y > pageHeight - marginBottom) {
-                newPage()
-            }
         }
     }
 
-    drawWrapped("Relatório Guardiã", bold = true)
-    drawWrapped("")
-    drawWrapped("Resumo: ${relatorio.resumo}")
-    drawWrapped("Categoria: ${relatorio.categoria}")
-    drawWrapped("Nível de risco: ${relatorio.risco}")
-    drawWrapped("Orientação: ${relatorio.orientacao}")
-    drawWrapped("Encaminhamento: ${relatorio.encaminhamento}")
-    drawWrapped("")
+    conteudo.forEach { (text, isTitle) ->
+        drawWrapped(text, isTitle)
+    }
 
     pdfDocument.finishPage(page)
 
