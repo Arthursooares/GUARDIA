@@ -116,10 +116,10 @@ fun PerigoScreen(onNavigateToGuardia: () -> Unit = {}) {
 
             // Imagem do personagem
             Image(
-                painter = painterResource(id = R.drawable.guardia_jogos),
+                painter = painterResource(id = R.drawable.perigos),
                 contentDescription = "Personagem Guardiã",
                 modifier = Modifier
-                    .size(230.dp)
+                    .size(290.dp)
                     .align(Alignment.CenterStart)
                     .offset(x = -40.dp, y = 80.dp),
                 contentScale = ContentScale.Crop
