@@ -103,32 +103,30 @@ fun PerigoScreen(onNavigateToGuardia: () -> Unit = {}) {
             )
             Box(
                 modifier = Modifier
-                    .offset(x = 50.dp, y = 90.dp)
+                    .offset(x = 40.dp, y = 110.dp)
                     .size(80.dp)
                     .background(color = card_bg_color, shape = CircleShape)
             )
             Box(
                 modifier = Modifier
-                    .offset(x = 85.dp, y = 75.dp)
+                    .offset(x = 70.dp, y = 105.dp)
                     .size(45.dp)
                     .background(color = Color(0xFF0A0647), shape = CircleShape)
             )
 
             // Imagem do personagem
             Image(
-                painter = painterResource(id = R.drawable.perigos),
+                painter = painterResource(id = R.drawable.perigo),
                 contentDescription = "Personagem Guardiã",
                 modifier = Modifier
-                    .size(290.dp)
-                    .align(Alignment.CenterStart)
-                    .offset(x = -40.dp, y = 80.dp),
+                    .size(500.dp) // Imagem maior para dar "zoom"
+                    .align(Alignment.BottomStart) // Alinhada à base
+                    .offset(x = -120.dp, y = 80.dp), // Puxa para cima e para a esquerda
                 contentScale = ContentScale.Crop
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Card de título
+        // Card de título (Spacer removido para "colar" a imagem)
         TitleCard("Perigos de Interação e Conteúdo (Contato e Conduta)")
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -277,7 +275,7 @@ fun PerigoScreen(onNavigateToGuardia: () -> Unit = {}) {
                     text = "Converse com a Guardiã",
                     color = title_color,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
+                    fontSize = 13.sp
                 )
             }
         }
@@ -339,7 +337,7 @@ private fun RiskInfoItem(title: String, description: String) {
 private fun BenefitItem(title: String, description: String) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .padding(vertical = 12.dp)
             .height(IntrinsicSize.Min)
     ) {
         Text(
@@ -347,49 +345,45 @@ private fun BenefitItem(title: String, description: String) {
             modifier = Modifier.weight(1f),
             color = text_color_on_dark,
             fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-            lineHeight = 18.sp
+            fontSize = 15.sp
         )
         VerticalDivider(
+            color = Color.White.copy(alpha = 0.3f),
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(horizontal = 12.dp)
-                .width(1.dp),
-            color = Color.White.copy(alpha = 0.5f)
+                .padding(horizontal = 8.dp)
         )
         Text(
             description,
             modifier = Modifier.weight(1.5f),
             color = text_color_on_dark,
-            fontSize = 13.sp,
-            lineHeight = 17.sp
+            fontSize = 14.sp,
+            lineHeight = 18.sp
         )
     }
 }
 
 @Composable
-private fun TitleCard(text: String) {
+fun TitleCard(text: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(card_bg_color)
-            .padding(vertical = 14.dp, horizontal = 20.dp),
+            .background(card_bg_color, RoundedCornerShape(12.dp))
+            .padding(vertical = 12.dp, horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
             color = text_color_on_dark,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            lineHeight = 20.sp,
             style = TextStyle(
                 shadow = Shadow(
-                    color = Color.White.copy(alpha = 0.3f),
+                    color = Color.White.copy(alpha = 0.5f),
                     offset = Offset.Zero,
-                    blurRadius = 8f
+                    blurRadius = 10f
                 )
             )
         )
@@ -397,13 +391,33 @@ private fun TitleCard(text: String) {
 }
 
 @Composable
-private fun InfoText(
+fun InfoText(
     text: String,
-    modifier: Modifier = Modifier,
-    color: Color = text_color_on_dark
+    highlights: List<String> = emptyList(),
+    color: Color = text_color_on_dark,
+    modifier: Modifier = Modifier
 ) {
     Text(
-        text = text,
+        buildAnnotatedString {
+            var currentIndex = 0
+            val textToProcess = text
+
+            while (currentIndex < textToProcess.length) {
+                val highlightFound = highlights.firstOrNull { highlight ->
+                    textToProcess.startsWith(highlight, currentIndex)
+                }
+
+                if (highlightFound != null) {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append(highlightFound)
+                    }
+                    currentIndex += highlightFound.length
+                } else {
+                    append(textToProcess[currentIndex])
+                    currentIndex++
+                }
+            }
+        },
         color = color,
         fontSize = 13.sp,
         lineHeight = 18.sp,
