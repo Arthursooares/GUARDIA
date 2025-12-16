@@ -156,12 +156,13 @@ fun ComunicacaoFamiliarScreen(navController: NavController) {
             text = "Muitos pais reconhecem a ameaça, mas uma grande parcela admite a falta de orientação e conhecimento sobre como proteger efetivamente seus filhos.",
             fontSize = 15.sp,
             color = Color(0xFF333333),
-            textAlign = TextAlign.Justify,
+            textAlign = TextAlign.Start,
             lineHeight = 22.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
         )
+
 
         // ===== CARD COM BULLETS =====
         Spacer(modifier = Modifier.height(16.dp))

@@ -95,6 +95,66 @@ data class MessageUi(
     val text: String
 )
 
+/**
+ * ✅ BLOQUEIOS "LEVE" (sem travar ninguém):
+ * 1) Small talk: "oi", "bom dia", "kkk" → responde no chat e NÃO gera relatório/PDF.
+ * 2) Contexto insuficiente: mensagem genérica/fora do tema sem detalhes → pede contexto e NÃO gera relatório/PDF.
+ *
+ * Só gera relatório quando houver conteúdo minimamente descritivo (risco/situação online envolvendo criança/adolescente).
+ */
+private fun normalizeText(s: String): String {
+    return s.lowercase()
+        .trim()
+        .replace(Regex("\\s+"), " ")
+}
+
+private fun isSmallTalk(input: String): Boolean {
+    val t = normalizeText(input)
+    if (t.isBlank()) return true
+
+    // muito curto e sem contexto
+    if (t.length <= 3) return true
+
+    val patterns = listOf(
+        Regex("^(oi|olá|ola|eai|e aí|iae|bom dia|boa tarde|boa noite)(!|\\.|\\?)?$"),
+        Regex("^(tudo bem|td bem|tudo bom|como vai|como vc ta|como você tá)(\\?|!|\\.)?$"),
+        Regex("^(ok|okk|blz|beleza|valeu|obg|obrigado|obrigada|kkk+|haha+|rs+)$")
+    )
+    if (patterns.any { it.matches(t) }) return true
+
+    // mensagem curta sem nenhuma “palavra de risco”
+    val riskKeywords = listOf(
+        "ameaça","ameaca","chantagem","foto","nude","nudes","sexual",
+        "assédio","assedio","grooming","estranho","desconhecido","encontro",
+        "grupo","humilha","humilhacao","bullying","vazar","vazou","vazamento",
+        "suic","automutil","cortar","matar","abuso","violência","violencia"
+    )
+
+    val hasRiskWord = riskKeywords.any { t.contains(it) }
+    return (t.length <= 12) && !hasRiskWord
+}
+
+/**
+ * Detecta quando a pessoa escreveu algo genérico/ambíguo ("preciso de ajuda", "aconteceu algo")
+ * e não deu elementos mínimos (criança/adolescente + online/app).
+ * Nesses casos: pede contexto e NÃO gera PDF.
+ */
+private fun isContextInsufficient(input: String): Boolean {
+    val t = normalizeText(input)
+    if (t.isBlank()) return true
+
+    // se for curto, quase sempre falta contexto
+    if (t.length <= 15) return true
+
+    val scopeSignals = listOf(
+        "filho","filha","criança","crianca","adolescente","menor",
+        "internet","celular","whatsapp","instagram","tiktok","youtube","discord","roblox","jogo","game",
+        "grupo","mensagem","direct","dm","perfil","senha","privacidade","dados","foto","link"
+    )
+
+    return scopeSignals.none { t.contains(it) }
+}
+
 // -------------------------------
 // BOLHA "Digitando…"
 // -------------------------------
@@ -382,6 +442,29 @@ fun GuardiaScreen() {
         isTyping = true
         lastRelatorio = null
 
+        // ✅ 1) Small talk → responde e NÃO gera relatório/PDF
+        if (isSmallTalk(original)) {
+            messages += MessageUi(
+                id = System.currentTimeMillis().toString() + "_a",
+                role = Role.ASSISTANT,
+                text = "Oi! 😊 Me conta rapidinho o que está acontecendo com a criança ou adolescente e em que você quer ajuda (por exemplo: contato com estranhos, bullying, pedido de fotos, excesso de tela)."
+            )
+            isTyping = false
+            return
+        }
+
+        // ✅ 2) Contexto insuficiente → pede detalhes e NÃO gera relatório/PDF
+        if (isContextInsufficient(original)) {
+            messages += MessageUi(
+                id = System.currentTimeMillis().toString() + "_a",
+                role = Role.ASSISTANT,
+                text = "Entendi. Para eu te orientar direitinho, você pode me contar um pouco mais? É sobre uma criança ou adolescente? O que aconteceu e em qual app ou situação online?"
+            )
+            isTyping = false
+            return
+        }
+
+        // ✅ 3) Agora sim: chama a IA e gera relatório
         scope.launch {
             try {
                 val res = chatApi.send(ChatRequest(original))
@@ -425,7 +508,6 @@ fun GuardiaScreen() {
                         relatorioRepo.salvar(entity)
 
                         // ✅ pega do banco o mais recente "de verdade"
-                        // (evita abrir relatório errado por ordem não garantida)
                         val ultimo = relatorioRepo
                             .listarTodos()
                             .maxByOrNull { it.dataHora }
@@ -565,7 +647,7 @@ fun GuardiaScreen() {
                         item { TypingBubble() }
                     }
 
-                    // ✅ abre o relatório MAIS RECENTE salvo (correto do contexto)
+                    // ✅ só mostra botão se houve relatório realmente salvo
                     val r = lastRelatorio
                     if (r != null) {
                         item {

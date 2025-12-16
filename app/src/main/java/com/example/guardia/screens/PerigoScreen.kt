@@ -88,7 +88,7 @@ fun PerigoScreen(onNavigateToGuardia: () -> Unit = {}) {
             ) {
                 // Texto de introdução (fundo)
                 Text(
-                    text = "Os jogos online, por sua natureza interativa e muitas vezes anônima, criam um ecossistema com vulnerabilidades específicas que exigem atenção redobrada dos pais e cuidadores.",
+                    text = "Os jogos online, por sua natureza interativa é muitas vezes anônima, criam um ecossistema com vulnerabilidades específicas que exigem atenção redobrada dos pais e cuidadores.",
                     color = text_color_on_dark,
                     fontSize = 13.sp,
                     lineHeight = 18.sp,
