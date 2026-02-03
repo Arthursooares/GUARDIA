@@ -123,9 +123,8 @@ Projeto desenvolvido por **Arthur Soares**, com foco em aprendizado prático de 
 
 ## 📄 Licença
 
-Este projeto não possui uma licença definida.
-Caso necessário, adicione um arquivo `LICENSE` para definir os termos de uso.
+Este projeto é distribuído sob a **Licença MIT**.  
+Você pode utilizar, modificar e distribuir este software livremente, desde que mantenha o aviso de copyright.
 
-```
-::contentReference[oaicite:0]{index=0}
-```
+Consulte o arquivo [`LICENSE`](./LICENSE) para mais detalhes.
+
